@@ -98,7 +98,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 .quick-toggle:active{background:#e2e8f0;}
 .quick-panel{background:#f8fafc;border-top:1px solid var(--border);padding:10px 13px 12px;display:none;}
 .quick-panel.open{display:block;}
-.qg-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:8px 0 5px;}
+.qg-lbl{font-size:14px;font-weight:800;letter-spacing:.3px;color:var(--brand-dk);margin:12px 0 6px;}
 .qg-lbl:first-child{margin-top:0;}
 .chips{display:flex;flex-wrap:wrap;gap:5px;}
 .chip{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;white-space:nowrap;}
@@ -242,7 +242,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
         <label class="flbl">Job Notes</label>
         <div class="notes-wrap">
           <textarea class="finp" id="f-notes" placeholder="Tap the mic to dictate or type notes here..." style="padding-bottom:48px;" oninput="sv()"></textarea>
-          <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Tap to dictate">🎤</button>
+          <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Tap to dictate"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 12a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V21H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-2.08A7 7 0 0 0 19 12z"/></svg></button>
         </div>
         <div id="mic-interim"></div>
       </div>
@@ -262,67 +262,75 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
           <th>Description</th>
           <th style="width:88px;">Unit $</th>
           <th style="width:74px;text-align:right;padding-right:8px;">Total</th>
-          <th style="width:52px;"></th>
+          <th style="width:66px;padding-right:10px;"></th>
         </tr></thead>
         <tbody id="lumber-tb"></tbody>
       </table>
     </div>
     <div class="tbl-actions">
       <button class="add-item-btn" onclick="addItem('lumber')">＋ Add item</button>
-      <button class="quick-toggle" id="lumber-qt" onclick="toggleQuick('lumber')">Quick Pick Lumber ▾</button>
+      <button class="quick-toggle" id="lumber-qt" onclick="toggleQuick('lumber')">⚡ Quick Pick Lumber ▾</button>
     </div>
     <div class="quick-panel" id="lumber-qp">
       <div class="qg-lbl">2×4</div>
       <div class="chips">
-        <button class="chip" onclick="quickAdd('lumber','2x4 x8')">x8</button>
-        <button class="chip" onclick="quickAdd('lumber','2x4 x10')">x10</button>
-        <button class="chip" onclick="quickAdd('lumber','2x4 x12')">x12</button>
-        <button class="chip" onclick="quickAdd('lumber','2x4 x16')">x16</button>
-        <button class="chip" onclick="quickAdd('lumber','2x4 x20')">x20</button>
-        <button class="chip" onclick="quickAdd('lumber','2x4 x12 PT')">x12 PT</button>
-        <button class="chip" onclick="quickAdd('lumber','2x4 x16 PT')">x16 PT</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 8\'')">8'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 10\'')">10'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 12\'')">12'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 14\'')">14'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 16\'')">16'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 20\'')">20'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 8\' PT')">8' PT</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 10\' PT')">10' PT</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 12\' PT')">12' PT</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 14\' PT')">14' PT</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 16\' PT')">16' PT</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 20\' PT')">20' PT</button>
       </div>
       <div class="qg-lbl">2×6</div>
       <div class="chips">
-        <button class="chip" onclick="quickAdd('lumber','2x6 x8')">x8</button>
-        <button class="chip" onclick="quickAdd('lumber','2x6 x10')">x10</button>
-        <button class="chip" onclick="quickAdd('lumber','2x6 x12')">x12</button>
-        <button class="chip" onclick="quickAdd('lumber','2x6 x16')">x16</button>
-        <button class="chip" onclick="quickAdd('lumber','2x6 x20')">x20</button>
+        <button class="chip" onclick="quickAdd('lumber','2x6 8\'')">8'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x6 10\'')">10'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x6 12\'')">12'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x6 14\'')">14'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x6 16\'')">16'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x6 20\'')">20'</button>
       </div>
       <div class="qg-lbl">2×8</div>
       <div class="chips">
-        <button class="chip" onclick="quickAdd('lumber','2x8 x8')">x8</button>
-        <button class="chip" onclick="quickAdd('lumber','2x8 x10')">x10</button>
-        <button class="chip" onclick="quickAdd('lumber','2x8 x12')">x12</button>
-        <button class="chip" onclick="quickAdd('lumber','2x8 x14')">x14</button>
-        <button class="chip" onclick="quickAdd('lumber','2x8 x16')">x16</button>
-        <button class="chip" onclick="quickAdd('lumber','2x8 x18')">x18</button>
-        <button class="chip" onclick="quickAdd('lumber','2x8 x20')">x20</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 8\'')">8'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 10\'')">10'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 12\'')">12'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 14\'')">14'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 16\'')">16'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 18\'')">18'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 20\'')">20'</button>
       </div>
       <div class="qg-lbl">2×10</div>
       <div class="chips">
-        <button class="chip" onclick="quickAdd('lumber','2x10 x8')">x8</button>
-        <button class="chip" onclick="quickAdd('lumber','2x10 x12')">x12</button>
-        <button class="chip" onclick="quickAdd('lumber','2x10 x16')">x16</button>
-        <button class="chip" onclick="quickAdd('lumber','2x10 x20')">x20</button>
+        <button class="chip" onclick="quickAdd('lumber','2x10 8\'')">8'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x10 12\'')">12'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x10 14\'')">14'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x10 16\'')">16'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x10 20\'')">20'</button>
       </div>
       <div class="qg-lbl">2×12</div>
       <div class="chips">
-        <button class="chip" onclick="quickAdd('lumber','2x12 x8')">x8</button>
-        <button class="chip" onclick="quickAdd('lumber','2x12 x12')">x12</button>
-        <button class="chip" onclick="quickAdd('lumber','2x12 x16')">x16</button>
-        <button class="chip" onclick="quickAdd('lumber','2x12 x20')">x20</button>
+        <button class="chip" onclick="quickAdd('lumber','2x12 8\'')">8'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x12 12\'')">12'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x12 14\'')">14'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x12 16\'')">16'</button>
+        <button class="chip" onclick="quickAdd('lumber','2x12 20\'')">20'</button>
       </div>
       <div class="qg-lbl">Posts &amp; Beams</div>
       <div class="chips">
-        <button class="chip" onclick="quickAdd('lumber','4x4 x8')">4x4 x8</button>
-        <button class="chip" onclick="quickAdd('lumber','4x4 x10')">4x4 x10</button>
-        <button class="chip" onclick="quickAdd('lumber','4x4 x12')">4x4 x12</button>
-        <button class="chip" onclick="quickAdd('lumber','4x6 x8')">4x6 x8</button>
-        <button class="chip" onclick="quickAdd('lumber','4x6 x10')">4x6 x10</button>
-        <button class="chip" onclick="quickAdd('lumber','6x6 x8')">6x6 x8</button>
-        <button class="chip" onclick="quickAdd('lumber','6x6 x10')">6x6 x10</button>
+        <button class="chip" onclick="quickAdd('lumber','4x4 8\'')">4x4 8'</button>
+        <button class="chip" onclick="quickAdd('lumber','4x4 10\'')">4x4 10'</button>
+        <button class="chip" onclick="quickAdd('lumber','4x4 12\'')">4x4 12'</button>
+        <button class="chip" onclick="quickAdd('lumber','4x6 8\'')">4x6 8'</button>
+        <button class="chip" onclick="quickAdd('lumber','4x6 10\'')">4x6 10'</button>
+        <button class="chip" onclick="quickAdd('lumber','6x6 8\'')">6x6 8'</button>
+        <button class="chip" onclick="quickAdd('lumber','6x6 10\'')">6x6 10'</button>
       </div>
       <div class="qg-lbl">Glulam Beams (GLB)</div>
       <div class="chips">
@@ -359,14 +367,14 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
           <th>Description</th>
           <th style="width:88px;">Unit $</th>
           <th style="width:74px;text-align:right;padding-right:8px;">Total</th>
-          <th style="width:52px;"></th>
+          <th style="width:66px;padding-right:10px;"></th>
         </tr></thead>
         <tbody id="hardware-tb"></tbody>
       </table>
     </div>
     <div class="tbl-actions">
       <button class="add-item-btn" onclick="addItem('hardware')">＋ Add item</button>
-      <button class="quick-toggle" id="hardware-qt" onclick="toggleQuick('hardware')">Quick Pick Hardware ▾</button>
+      <button class="quick-toggle" id="hardware-qt" onclick="toggleQuick('hardware')">⚡ Quick Pick Hardware ▾</button>
     </div>
     <div class="quick-panel" id="hardware-qp">
       <div class="qg-lbl">Hurricane &amp; Rafter Ties</div>
@@ -897,7 +905,7 @@ function renderItems(type, arr) {
       <td style="padding:5px 4px;"><input class="iinp" type="text" value="${esc(it.desc||'')}" placeholder="Description" style="width:100%;min-width:110px;" oninput="updItem('${type}',${i},'desc',this.value)"/></td>
       <td><input class="iinp price" type="number" min="0" step="0.01" value="${esc(it.unitPrice||'')}" placeholder="—" oninput="updItem('${type}',${i},'unitPrice',this.value)"/></td>
       <td><div class="irow-tot" id="${type}-tot-${i}">${totHtml}</div></td>
-      <td style="white-space:nowrap;"><button class="lkp-btn" onclick="lookupPrice('${type}',${i})" title="Look up price on Home Depot">🔍</button><button class="del-btn" onclick="rmItem('${type}',${i})">×</button></td>
+      <td style="white-space:nowrap;padding-right:10px;text-align:right;"><button class="lkp-btn" onclick="lookupPrice('${type}',${i})" title="Look up price on Home Depot">🔍</button><button class="del-btn" onclick="rmItem('${type}',${i})">×</button></td>
     </tr>`;
   }).join('');
 }
@@ -961,8 +969,8 @@ function toggleQuick(type) {
   const btn = document.getElementById(`${type}-qt`);
   const open = panel.classList.toggle('open');
   btn.textContent = open
-    ? `Quick Pick ${type.charAt(0).toUpperCase()+type.slice(1)} ▴`
-    : `Quick Pick ${type.charAt(0).toUpperCase()+type.slice(1)} ▾`;
+    ? `⚡ Quick Pick ${type.charAt(0).toUpperCase()+type.slice(1)} ▴`
+    : `⚡ Quick Pick ${type.charAt(0).toUpperCase()+type.slice(1)} ▾`;
 }
 
 /* ══════════════════════════════════════════
@@ -970,6 +978,8 @@ function toggleQuick(type) {
 ══════════════════════════════════════════ */
 let recognition = null;
 let isListening = false;
+const MIC_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="#fff" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 12a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V21H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-2.08A7 7 0 0 0 19 12z"/></svg>';
+const STOP_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>';
 
 function toggleMic() {
   if (isListening) { stopMic(); return; }
@@ -990,7 +1000,7 @@ function toggleMic() {
 
   recognition.onstart = () => {
     isListening = true;
-    btn.textContent = '⏹';
+    btn.innerHTML = STOP_SVG;
     btn.classList.add('listening');
     interim.textContent = 'Listening...';
   };
@@ -1005,7 +1015,7 @@ function toggleMic() {
         interimText += t;
       }
     }
-    interim.textContent = interimText || '🎤 Listening...';
+    interim.textContent = interimText || 'Listening...';
     if (finalBuffer) {
       const cur = notes.value.trim();
       notes.value = cur ? cur + '\n' + finalBuffer : finalBuffer;
@@ -1030,7 +1040,7 @@ function stopMic() {
   if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
   isListening = false;
   const btn = document.getElementById('mic-btn');
-  if (btn) { btn.textContent = '🎤'; btn.classList.remove('listening'); }
+  if (btn) { btn.innerHTML = MIC_SVG; btn.classList.remove('listening'); }
   const interim = document.getElementById('mic-interim');
   if (interim) interim.textContent = '';
 }
@@ -1091,9 +1101,8 @@ function orderMaterials() {
   L.push('');
   if (lum.length) { L.push('LUMBER'); L.push(...lum); L.push(''); }
   if (hw.length)  { L.push('HARDWARE'); L.push(...hw); L.push(''); }
-  L.push('Thank you!');
   const subject = `Material Order – ${e.client || 'Estimate'}`;
-  const body = L.join('\n');
+  const body = L.join('\n').replace(/\n+$/, '');
   window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
