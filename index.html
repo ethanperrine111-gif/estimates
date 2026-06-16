@@ -238,11 +238,8 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
       </div>
       <div class="fgrid" style="margin-top:11px;">
         <div class="frow">
-          <label class="flbl">Client</label>
-          <select class="finp" id="f-clientsel" onchange="onClientChange()">
-            <option value="">Select client...</option>
-            <option value="__add__">+ Add new client...</option>
-          </select>
+          <label class="flbl">Company Name</label>
+          <input class="finp" id="f-company" placeholder="Company name" oninput="sv()"/>
         </div>
         <div class="frow">
           <label class="flbl">Project Manager</label>
@@ -264,11 +261,15 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
       <div class="frow" style="margin-top:11px;">
         <label class="flbl">Status</label>
         <select class="finp" id="f-status" onchange="sv()">
-          <option value="draft">Draft</option>
-          <option value="sent">Sent</option>
-          <option value="approved">Approved</option>
-          <option value="completed">Completed</option>
+          <option value="draft">🟡 Draft</option>
+          <option value="sent">🔵 Sent</option>
+          <option value="approved">🟢 Approved</option>
+          <option value="completed">✅ Completed</option>
         </select>
+      </div>
+      <div class="frow" style="margin-top:11px;">
+        <label class="flbl">Job Address</label>
+        <textarea class="finp" id="f-address" placeholder="Street, city, state" style="min-height:52px;" oninput="sv()"></textarea>
       </div>
       <div class="frow" style="margin-top:11px;">
         <label class="flbl">Job Notes</label>
@@ -661,18 +662,10 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 <div id="manage-modal">
   <div id="manage-box">
     <div class="sm-hdr">
-      <h2>Clients &amp; Subs</h2>
+      <h2>Subs &amp; Prices</h2>
       <button class="sm-close" onclick="closeManage()">×</button>
     </div>
     <div id="manage-body">
-      <div class="mg-sec">
-        <div class="mg-h">Clients</div>
-        <div id="client-list"></div>
-        <div class="mg-add">
-          <input class="finp" id="new-client" placeholder="New client name"/>
-          <button class="mg-addbtn" onclick="addClient()">Add</button>
-        </div>
-      </div>
       <div class="mg-sec">
         <div class="mg-h">Subcontractors</div>
         <div id="sub-list"></div>
@@ -759,8 +752,8 @@ function newEst() {
   const id = uid();
   db.ests.unshift({
     id,
-    client: '', clientName: '', pm: '', pmOther: '',
-    status: 'draft', notes: '',
+    client: '', company: '', pm: '', pmOther: '',
+    status: 'draft', address: '', notes: '',
     lumber: [], hardware: [],
     pr: { auto: true, orv: 0, taxInc: true, tax: 0, ucMode: '%', ucVal: 20, buf: 300, delInc: true, del: 0 },
     lb: { name: '', days: '', daily: 0, hourly: 0, subCost: 0, subDemo: 0, cliLab: 0, cliDemo: 0 },
@@ -784,9 +777,7 @@ function loadForm(id) {
   if (!e) return;
   document.getElementById('hdr-title').textContent = e.client || 'New Estimate';
   document.getElementById('f-client').value = e.client || '';
-
-  // Client dropdown
-  populateClients(e.clientName || '');
+  document.getElementById('f-company').value = e.company || '';
 
   // PM dropdown
   const pmSel = document.getElementById('f-pm');
@@ -802,6 +793,7 @@ function loadForm(id) {
   }
 
   document.getElementById('f-status').value = e.status || 'draft';
+  document.getElementById('f-address').value = e.address || '';
   document.getElementById('f-notes').value = e.notes || '';
 
   const p = e.pr || {};
@@ -846,8 +838,7 @@ function sv() {
   if (!e) return;
 
   e.client = document.getElementById('f-client').value;
-  const clSel = document.getElementById('f-clientsel');
-  if (clSel.value !== '__add__') e.clientName = clSel.value;
+  e.company = document.getElementById('f-company').value;
   const pmSel = document.getElementById('f-pm');
   if (pmSel.value === '__other__') {
     e.pm = '';
@@ -857,6 +848,7 @@ function sv() {
     e.pmOther = '';
   }
   e.status = document.getElementById('f-status').value;
+  e.address = document.getElementById('f-address').value;
   e.notes = document.getElementById('f-notes').value;
   document.getElementById('hdr-title').textContent = e.client || 'New Estimate';
 
@@ -910,27 +902,6 @@ function onPMChange() {
   sv();
 }
 
-/* ── Clients dropdown ── */
-function populateClients(selected) {
-  const sel = document.getElementById('f-clientsel');
-  const opts = ['<option value="">Select client...</option>'];
-  db.clients.slice().sort((a, b) => a.localeCompare(b)).forEach(c => {
-    opts.push(`<option value="${esc(c)}">${esc(c)}</option>`);
-  });
-  opts.push('<option value="__add__">+ Add new client...</option>');
-  sel.innerHTML = opts.join('');
-  sel.value = (selected && db.clients.includes(selected)) ? selected : '';
-}
-function onClientChange() {
-  const sel = document.getElementById('f-clientsel');
-  if (sel.value === '__add__') {
-    const n = (prompt('New client name') || '').trim();
-    if (n) { if (!db.clients.includes(n)) db.clients.push(n); dbSave(); populateClients(n); }
-    else { populateClients((getEst(db.cur) || {}).clientName || ''); }
-  }
-  sv();
-}
-
 /* ── Subs dropdown ── */
 function populateSubs(selected) {
   const sel = document.getElementById('sub-sel');
@@ -971,25 +942,10 @@ function closeManage() {
   document.getElementById('manage-modal').classList.remove('on');
   if (document.getElementById('edit-view').classList.contains('on')) {
     const e = getEst(db.cur);
-    if (e) { populateClients(e.clientName || ''); populateSubs((e.lb && e.lb.name) || ''); }
+    if (e) { populateSubs((e.lb && e.lb.name) || ''); }
   }
 }
-function renderManage() { renderClients(); renderSubs(); renderPrices(); }
-
-function renderClients() {
-  const el = document.getElementById('client-list');
-  if (!db.clients.length) { el.innerHTML = '<div class="mg-empty">No clients yet.</div>'; return; }
-  el.innerHTML = db.clients.map((c, i) =>
-    `<div class="mg-row"><div class="nm">${esc(c)}</div><button class="mg-x" onclick="rmClient(${i})">×</button></div>`).join('');
-}
-function addClient() {
-  const inp = document.getElementById('new-client');
-  const n = (inp.value || '').trim();
-  if (!n) return;
-  if (!db.clients.includes(n)) db.clients.push(n);
-  inp.value = ''; dbSave(); renderClients();
-}
-function rmClient(i) { db.clients.splice(i, 1); dbSave(); renderClients(); }
+function renderManage() { renderSubs(); renderPrices(); }
 
 function renderSubs() {
   const el = document.getElementById('sub-list');
@@ -1133,7 +1089,7 @@ function renderItems(type, arr) {
     return `<tr>
       <td style="padding-left:10px;"><input class="iinp qty" type="number" min="1" value="${esc(it.qty||1)}" oninput="updItem('${type}',${i},'qty',this.value)"/></td>
       <td style="padding:5px 4px;"><input class="iinp" type="text" value="${esc(it.desc||'')}" placeholder="Description" style="width:100%;min-width:110px;" oninput="updItem('${type}',${i},'desc',this.value)"/></td>
-      <td><input class="iinp price" type="number" min="0" step="0.01" value="${esc(it.unitPrice||'')}" placeholder="—" oninput="updItem('${type}',${i},'unitPrice',this.value)"/></td>
+      <td><input class="iinp price" id="${type}-price-${i}" type="number" min="0" step="0.01" value="${esc(it.unitPrice||'')}" placeholder="—" oninput="updItem('${type}',${i},'unitPrice',this.value)"/></td>
       <td><div class="irow-tot" id="${type}-tot-${i}">${totHtml}</div></td>
       <td style="white-space:nowrap;padding-right:10px;text-align:right;"><button class="lkp-btn" onclick="lookupPrice('${type}',${i})" title="Look up price on Home Depot">🔍</button><button class="del-btn" onclick="rmItem('${type}',${i})">×</button></td>
     </tr>`;
@@ -1178,6 +1134,15 @@ function updItem(type, i, field, val) {
   if (field === 'unitPrice' && val !== '') {
     const k = priceKey(e[type][i].desc);
     if (k) db.prices[k] = parseFloat(val) || 0;
+  }
+  // autofill last-used price when a known material is typed in
+  if (field === 'desc') {
+    const k = priceKey(val);
+    if (k && db.prices[k] != null && (e[type][i].unitPrice === '' || e[type][i].unitPrice == null)) {
+      e[type][i].unitPrice = db.prices[k];
+      const pe = document.getElementById(`${type}-price-${i}`);
+      if (pe) pe.value = db.prices[k];
+    }
   }
   const q = parseFloat(e[type][i].qty) || 0, u = parseFloat(e[type][i].unitPrice) || 0;
   const totEl = document.getElementById(`${type}-tot-${i}`);
@@ -1305,7 +1270,7 @@ function renderList() {
   el.innerHTML=db.ests.map(e=>{
     const gt=calcGrandTotal(e), sc=colors[e.status]||'#94a3b8';
     const pmDisplay = e.pmOther || e.pm || '';
-    const meta=[e.clientName?esc(e.clientName):'',pmDisplay?'PM: '+esc(pmDisplay):'',`<span style="color:${sc};font-weight:700">${e.status||'draft'}</span>`].filter(Boolean).join(' · ');
+    const meta=[e.company?esc(e.company):'',pmDisplay?'PM: '+esc(pmDisplay):'',`<span style="color:${sc};font-weight:700">${e.status||'draft'}</span>`].filter(Boolean).join(' · ');
     return`<div class="est-card" onclick="goEdit('${e.id}')">
       <div class="ec-info">
         <div class="ec-name">${esc(e.client||'Untitled Estimate')}</div>
@@ -1331,11 +1296,12 @@ function orderMaterials() {
     alert('Add some lumber or hardware items first, then tap Order Materials.');
     return;
   }
-  const L = [];
-  L.push(`Material order for: ${e.client || 'Estimate'}`);
   const pm = e.pmOther || e.pm || '';
-  if (pm) L.push(`PM: ${pm}`);
+  const greet = pm ? `Hey ${pm},` : 'Hi,';
+  const L = [];
+  L.push(`${greet} here's an order for you. We'll be ready for this on ______. Let me know if you have any questions.`);
   L.push('');
+  if (e.address) { L.push(e.address); L.push(''); }
   if (lum.length) { L.push('LUMBER'); L.push(...lum); L.push(''); }
   if (hw.length)  { L.push('HARDWARE'); L.push(...hw); L.push(''); }
   const subject = `Material Order – ${e.client || 'Estimate'}`;
@@ -1361,8 +1327,9 @@ function showShare() {
 
   const lines=[];
   lines.push(e.client||'Estimate');
-  if(e.clientName) lines.push(`Client: ${e.clientName}`);
+  if(e.company) lines.push(`Company: ${e.company}`);
   if(pmLabel) lines.push(`PM: ${pmLabel}`);
+  if(e.address) lines.push(`Address: ${e.address}`);
   if(e.notes) lines.push(`\nNotes:\n${e.notes}`);
   if((e.lumber||[]).length){
     lines.push('\nLumber');
