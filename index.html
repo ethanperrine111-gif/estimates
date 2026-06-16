@@ -184,12 +184,38 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 .mg-note{font-size:11px;color:var(--muted);margin-top:8px;}
 .mg-empty{font-size:13px;color:var(--muted);padding:6px 0;}
 
+/* Share preview + printable estimate document */
+#share-preview{flex:1;overflow:auto;background:#eef2f6;padding:12px;}
+#doc{display:none;}
+.doc-wrap{max-width:780px;margin:0 auto;padding:26px 28px;background:#fff;color:#0f172a;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;border-radius:8px;}
+.doc-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--brand);padding-bottom:13px;margin-bottom:16px;}
+.doc-brand{display:flex;align-items:center;gap:10px;}
+.doc-brand img{width:40px;height:40px;border-radius:9px;}
+.doc-brand .nm{font-size:21px;font-weight:800;letter-spacing:-.3px;}
+.doc-title{text-align:right;}
+.doc-title .t{font-size:19px;font-weight:800;letter-spacing:1.5px;color:var(--brand);}
+.doc-title .d{font-size:12px;color:var(--muted);margin-top:3px;}
+.doc-job{font-size:23px;font-weight:800;margin-bottom:12px;letter-spacing:-.4px;}
+.doc-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px 20px;margin-bottom:6px;font-size:13px;}
+.doc-meta .lbl{color:var(--muted);font-weight:800;text-transform:uppercase;font-size:9.5px;letter-spacing:.5px;margin-bottom:1px;}
+.doc-sec{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--brand-dk);border-bottom:1.5px solid var(--border);padding-bottom:4px;margin:18px 0 7px;}
+.doc-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:4px;}
+.doc-tbl th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:5px 6px;border-bottom:1px solid var(--border);}
+.doc-tbl td{padding:5px 6px;border-bottom:1px solid #f1f5f9;}
+.doc-tbl td.r,.doc-tbl th.r{text-align:right;}
+.doc-row{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:4px 2px;}
+.doc-row.b{font-weight:800;border-top:1.5px solid var(--border);margin-top:3px;padding-top:7px;}
+.doc-total{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#7c2d12 0%,var(--brand) 55%,var(--brand-lt) 100%);color:#fff;border-radius:10px;padding:14px 18px;margin:16px 0;}
+.doc-total .amt{font-size:25px;font-weight:800;}
+.doc-total .cap{font-size:10px;opacity:.85;font-weight:700;letter-spacing:.5px;}
+.doc-muted{color:var(--muted);}
+
 @media print{
-  #hdr,#bot-bar,#share-modal{display:none!important;}
-  .card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid;}
-  body,#edit-view{background:#fff!important;padding:0!important;}
-  .gt-banner{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .quick-panel,.tbl-actions{display:none!important;}
+  #hdr,#list-view,#edit-view,#bot-bar,#share-modal,#manage-modal{display:none!important;}
+  #doc{display:block!important;}
+  .doc-wrap{max-width:none;border-radius:0;padding:0;}
+  body{background:#fff!important;}
+  .doc-head,.doc-total{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 }
 @media(max-width:480px){
   .fgrid{grid-template-columns:1fr;}
@@ -208,7 +234,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
   <div id="hdr-r">
     <button class="hbtn always" id="lists-btn" onclick="openManage()">Lists</button>
     <button class="hbtn" id="share-btn" onclick="showShare()">Share</button>
-    <button class="hbtn" id="print-btn" onclick="window.print()">Print</button>
+    <button class="hbtn" id="print-btn" onclick="printDoc()">Print</button>
     <button class="hbtn" id="back-btn" onclick="goList()">← Back</button>
   </div>
 </div>
@@ -642,13 +668,17 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
       <h2>Share Estimate</h2>
       <button class="sm-close" onclick="closeShare()">×</button>
     </div>
-    <textarea id="share-txt" readonly></textarea>
+    <div id="share-preview"></div>
+    <textarea id="share-txt" readonly style="display:none;"></textarea>
     <div class="sm-foot">
-      <button class="abtn secondary" id="copy-btn" onclick="copyShare()" style="flex:1;">Copy</button>
-      <button class="abtn primary" onclick="closeShare()" style="flex:1;">Done</button>
+      <button class="abtn primary" onclick="printDoc()" style="flex:1;">Save as PDF</button>
+      <button class="abtn secondary" id="copy-btn" onclick="copyShare()" style="flex:1;">Copy Text</button>
     </div>
   </div>
 </div>
+
+<!-- Printable estimate document -->
+<div id="doc"></div>
 
 <!-- ── Manage Modal (Clients & Subs) ── -->
 <div id="manage-modal">
@@ -1441,7 +1471,84 @@ function showShare() {
   lines.push(`\tWe stand to make: ${fmt(profit)} (profit margin: ~${margin.toFixed(0)}%)`);
 
   document.getElementById('share-txt').value=lines.join('\n');
+  document.getElementById('share-preview').innerHTML=buildDocHTML();
   document.getElementById('share-modal').classList.add('on');
+}
+
+/* ── Formatted estimate document (for PDF / print) ── */
+function buildDocHTML(){
+  const e=getEst(db.cur); if(!e) return '';
+  const iS=arr=>(arr||[]).reduce((s,it)=>s+(parseFloat(it.qty)||0)*(parseFloat(it.unitPrice)||0),0);
+  const p=e.pr||{},l=e.lb||{};
+  const vS=p.auto!==false?iS(e.lumber)+iS(e.hardware):(p.orv||0);
+  const uc=p.ucMode==='%'?vS*((p.ucVal||0)/100):(p.ucVal||0);
+  const tax=p.taxInc?0:(p.tax||0), del=p.delInc?0:(p.del||0), buf=p.buf||0;
+  const clientMat=vS+uc+tax+buf+del;
+  const cliLab=(l.cliLab||0)+(l.cliDemo||0), gt=clientMat+cliLab;
+  const subExp=(l.subCost||0), expenses=vS+subExp+(e.mgmtLabor||0);
+  const profit=gt-expenses, margin=gt>0?profit/gt*100:0;
+  const pm=e.pmOther||e.pm||'';
+  const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+
+  const rows=arr=>(arr||[]).filter(it=>(it.desc||'').trim()).map(it=>{
+    const q=parseFloat(it.qty)||0,u=parseFloat(it.unitPrice)||0;
+    return `<tr><td>${q||''}</td><td>${esc(it.desc)}</td><td class="r">${u?fmt(u):''}</td><td class="r">${q&&u?fmt(q*u):''}</td></tr>`;
+  }).join('');
+  const tbl=(title,arr)=>{ const r=rows(arr); if(!r) return '';
+    return `<div class="doc-sec">${title}</div><table class="doc-tbl"><thead><tr><th style="width:40px">Qty</th><th>Description</th><th class="r" style="width:64px">Unit</th><th class="r" style="width:78px">Total</th></tr></thead><tbody>${r}</tbody></table>`; };
+
+  const meta=[];
+  if(e.company) meta.push(`<div><div class="lbl">Company</div>${esc(e.company)}</div>`);
+  if(pm) meta.push(`<div><div class="lbl">Project Manager</div>${esc(pm)}</div>`);
+  if(e.address) meta.push(`<div><div class="lbl">Address</div>${esc(e.address)}</div>`);
+  meta.push(`<div><div class="lbl">Status</div>${esc(e.status||'draft')}</div>`);
+
+  const matRows=[
+    `<div class="doc-row"><span>Vendor subtotal</span><span>${fmt(vS)}</span></div>`,
+    `<div class="doc-row"><span>Taxes${p.taxInc?' (included)':''}</span><span>${fmt(tax)}</span></div>`,
+    uc?`<div class="doc-row"><span>Upcharge${p.ucMode==='%'?' ('+(p.ucVal||0)+'%)':''}</span><span>${fmt(uc)}</span></div>`:'',
+    buf?`<div class="doc-row"><span>Buffer</span><span>${fmt(buf)}</span></div>`:'',
+    `<div class="doc-row"><span>Delivery${p.delInc?' (included)':''}</span><span>${fmt(del)}</span></div>`,
+    `<div class="doc-row b"><span>Client Materials Total</span><span>${fmt(clientMat)}</span></div>`
+  ].join('');
+
+  const laborRows=[
+    (l.name||l.days)?`<div class="doc-row"><span>${esc(l.name||'Sub')}${l.days?' — '+esc(l.days)+' days':''}</span><span class="doc-muted">our cost ${fmt(subExp)}</span></div>`:'',
+    `<div class="doc-row"><span>Labor charge</span><span>${fmt(l.cliLab||0)}</span></div>`,
+    l.cliDemo?`<div class="doc-row"><span>Demo charge</span><span>${fmt(l.cliDemo)}</span></div>`:'',
+    `<div class="doc-row b"><span>Client Labor Total</span><span>${fmt(cliLab)}</span></div>`
+  ].join('');
+
+  const expRows=[
+    `<div class="doc-row"><span>Vendor materials</span><span>${fmt(vS)}</span></div>`,
+    `<div class="doc-row"><span>Sub labor</span><span>${fmt(subExp)}</span></div>`,
+    e.mgmtLabor?`<div class="doc-row"><span>Managing labor &amp; expenses</span><span>${fmt(e.mgmtLabor)}</span></div>`:'',
+    `<div class="doc-row b"><span>Total Expenses</span><span>${fmt(expenses)}</span></div>`,
+    `<div class="doc-row b"><span>Profit</span><span style="color:var(--green)">${fmt(profit)} (${margin.toFixed(1)}%)</span></div>`
+  ].join('');
+
+  return `<div class="doc-wrap">
+    <div class="doc-head">
+      <div class="doc-brand"><img src="icon-192.png" alt=""/><div class="nm">QuickQuote</div></div>
+      <div class="doc-title"><div class="t">ESTIMATE</div><div class="d">${date}</div></div>
+    </div>
+    <div class="doc-job">${esc(e.client||'Untitled Estimate')}</div>
+    <div class="doc-meta">${meta.join('')}</div>
+    ${e.notes?`<div class="doc-sec">Notes</div><div style="font-size:13px;white-space:pre-wrap;">${esc(e.notes)}</div>`:''}
+    ${tbl('Lumber',e.lumber)}
+    ${tbl('Hardware',e.hardware)}
+    <div class="doc-sec">Materials Pricing</div>${matRows}
+    <div class="doc-sec">Labor</div>${laborRows}
+    <div class="doc-total">
+      <div><div class="cap">GRAND TOTAL (CLIENT)</div><div class="amt">${fmt(gt)}</div></div>
+      <div style="text-align:right"><div class="cap">MARGIN</div><div class="amt">${gt>0?margin.toFixed(1)+'%':'—'}</div></div>
+    </div>
+    <div class="doc-sec">Internal — Expenses &amp; Profit</div>${expRows}
+  </div>`;
+}
+function printDoc(){
+  document.getElementById('doc').innerHTML=buildDocHTML();
+  window.print();
 }
 
 function closeShare(){ document.getElementById('share-modal').classList.remove('on'); }
@@ -1449,10 +1556,10 @@ function closeShare(){ document.getElementById('share-modal').classList.remove('
 function copyShare(){
   const txt=document.getElementById('share-txt');
   const btn=document.getElementById('copy-btn');
-  txt.select(); txt.setSelectionRange(0,99999);
-  try{ document.execCommand('copy'); } catch(e){ if(navigator.clipboard) navigator.clipboard.writeText(txt.value).catch(function(){}); }
-  btn.textContent='Copied!';
-  setTimeout(()=>{ btn.textContent='Copy'; },2000);
+  const done=()=>{ btn.textContent='Copied!'; setTimeout(()=>{ btn.textContent='Copy Text'; },2000); };
+  const fallback=()=>{ txt.style.display='block'; txt.select(); txt.setSelectionRange(0,99999); try{ document.execCommand('copy'); }catch(e){} txt.style.display='none'; done(); };
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt.value).then(done).catch(fallback); }
+  else fallback();
 }
 
 document.getElementById('share-modal').addEventListener('click',function(e){ if(e.target===this) closeShare(); });
