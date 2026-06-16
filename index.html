@@ -563,7 +563,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
       <div style="border-top:1.5px dashed var(--border);margin:10px 0;"></div>
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:6px;">We Charge Client</div>
       <div class="prow">
-        <div class="plbl bold">Labor charge <span class="auto-badge">$3,000/day</span></div>
+        <div class="plbl bold">Labor charge <span class="auto-badge" id="cli-rate-badge">$3,000/day</span></div>
         <input class="pinp" id="cli-labor" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
       </div>
       <div class="prow">
@@ -578,12 +578,12 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
     <div class="card-hdr"><span class="card-ttl">Other Expenses</span></div>
     <div class="card-bd">
       <div class="prow">
-        <div class="plbl">Managing Labor &amp; Expenses</div>
+        <div class="plbl">Managing Labor &amp; Expenses <span class="auto-badge" id="mgmt-rate-badge">$35/hr</span></div>
         <input class="pinp" id="mgmt-labor" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
       </div>
       <div class="prow" style="border-bottom:none;">
-        <div class="plbl">Hours</div>
-        <input class="pinp" id="mgmt-hours" type="number" min="0" step="0.5" placeholder="0" oninput="sv()"/>
+        <div class="plbl">Hours <span class="auto-badge">× rate</span></div>
+        <input class="pinp" id="mgmt-hours" type="number" min="0" step="0.5" placeholder="0" oninput="recalcMgmt()"/>
       </div>
     </div>
   </div>
@@ -659,6 +659,11 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
     </div>
     <div id="manage-body">
       <div class="mg-sec">
+        <div class="mg-h">Rates</div>
+        <div class="mg-row"><div class="nm">Client labor — per day</div><span class="rate-lbl">$</span><input class="sub-rate" id="rate-clientday" type="number" min="0" step="1" onchange="updRate('clientDayRate',this.value)"/></div>
+        <div class="mg-row"><div class="nm">Managing labor — per hour</div><span class="rate-lbl">$</span><input class="sub-rate" id="rate-mgmthr" type="number" min="0" step="1" onchange="updRate('mgmtHourRate',this.value)"/></div>
+      </div>
+      <div class="mg-sec">
         <div class="mg-h">Companies</div>
         <div id="company-list"></div>
         <div class="mg-add">
@@ -701,9 +706,11 @@ function dbLoad() {
   db.companies = db.companies || [];
   db.subs = db.subs || [];
   db.prices = db.prices || {};
+  db.settings = db.settings || {};
+  if (db.settings.clientDayRate == null) db.settings.clientDayRate = 3000;
+  if (db.settings.mgmtHourRate == null) db.settings.mgmtHourRate = 35;
 }
 const priceKey = d => String(d || '').trim().toLowerCase();
-const CLIENT_DAY_RATE = 3000;
 function dbSave() { try { localStorage.setItem(STORE_KEY, JSON.stringify(db)); } catch(e) {} }
 
 /* ══════════════════════════════════════════
@@ -825,6 +832,7 @@ function loadForm(id) {
 
   renderItems('lumber', e.lumber || []);
   renderItems('hardware', e.hardware || []);
+  refreshRateBadges();
   rc();
 }
 
@@ -924,10 +932,25 @@ function recalcLabor() {
   const days = parseFloat(document.getElementById('sub-days').value) || 0;
   const daily = parseFloat(document.getElementById('sub-daily').value) || 0;
   const subCost = days * daily;
-  const cliLabor = days * CLIENT_DAY_RATE;
+  const cliLabor = days * (db.settings.clientDayRate || 0);
   document.getElementById('sub-cost').value = subCost ? subCost : '';
   document.getElementById('cli-labor').value = cliLabor ? cliLabor : '';
   sv(); rc();
+}
+
+/* ── Managing labor auto-calc: hours × rate ── */
+function recalcMgmt() {
+  const hrs = parseFloat(document.getElementById('mgmt-hours').value) || 0;
+  const amt = hrs * (db.settings.mgmtHourRate || 0);
+  if (hrs) document.getElementById('mgmt-labor').value = amt ? amt : '';
+  sv(); rc();
+}
+
+function refreshRateBadges() {
+  const cb = document.getElementById('cli-rate-badge');
+  const mb = document.getElementById('mgmt-rate-badge');
+  if (cb) cb.textContent = '$' + Number(db.settings.clientDayRate || 0).toLocaleString() + '/day';
+  if (mb) mb.textContent = '$' + Number(db.settings.mgmtHourRate || 0).toLocaleString() + '/hr';
 }
 
 /* ── Subs dropdown ── */
@@ -971,7 +994,21 @@ function closeManage() {
     if (e) { populateCompanies(e.company || ''); populateSubs((e.lb && e.lb.name) || ''); }
   }
 }
-function renderManage() { renderCompanies(); renderSubs(); renderPrices(); }
+function renderManage() { renderRates(); renderCompanies(); renderSubs(); renderPrices(); }
+
+function renderRates() {
+  document.getElementById('rate-clientday').value = db.settings.clientDayRate || '';
+  document.getElementById('rate-mgmthr').value = db.settings.mgmtHourRate || '';
+}
+function updRate(key, val) {
+  db.settings[key] = parseFloat(val) || 0;
+  dbSave();
+  if (document.getElementById('edit-view').classList.contains('on') && getEst(db.cur)) {
+    refreshRateBadges();
+    recalcLabor();
+    recalcMgmt();
+  }
+}
 
 function renderCompanies() {
   const el = document.getElementById('company-list');
