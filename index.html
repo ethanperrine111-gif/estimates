@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Estimates"/>
+<meta name="theme-color" content="#c2410c"/>
+<title>Estimate Builder</title>
+<style>
+:root{--brand:#ea580c;--brand-dk:#c2410c;--brand-lt:#f97316;--bg:#f8fafc;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;--green:#16a34a;--red:#dc2626;--yellow:#ca8a04;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
+
+/* ── Header ── */
+#hdr{background:linear-gradient(135deg,#7c2d12 0%,var(--brand) 55%,var(--brand-lt) 100%);padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top,0px));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3);}
+#hdr-title{color:#fff;font-size:18px;font-weight:800;letter-spacing:-.2px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#hdr-r{display:flex;gap:6px;flex-shrink:0;}
+.hbtn{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);color:#fff;padding:6px 11px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;display:none;white-space:nowrap;}
+.hbtn:active{background:rgba(255,255,255,.32);}
+
+/* ── Views ── */
+.view{display:none;} .view.on{display:block;}
+
+/* ── List view ── */
+#list-view{padding:14px;padding-bottom:calc(env(safe-area-inset-bottom,0px)+14px);max-width:620px;margin:0 auto;}
+.new-est-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--brand);color:#fff;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(234,88,12,.35);margin-bottom:16px;}
+.new-est-btn:active{background:var(--brand-dk);}
+.est-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-bottom:10px;display:flex;align-items:center;gap:11px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.est-card:active{background:#f1f5f9;}
+.ec-icon{font-size:26px;flex-shrink:0;}
+.ec-info{flex:1;min-width:0;}
+.ec-name{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ec-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.ec-total{font-size:17px;font-weight:800;color:var(--brand);white-space:nowrap;flex-shrink:0;}
+.ec-arrow{color:#cbd5e1;font-size:18px;flex-shrink:0;}
+.empty-state{text-align:center;padding:52px 20px;color:var(--muted);}
+.empty-ico{font-size:52px;margin-bottom:12px;}
+.empty-msg{font-size:16px;font-weight:700;color:#334155;margin-bottom:6px;}
+.empty-sub{font-size:14px;}
+
+/* ── Edit view ── */
+#edit-view{padding:14px;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));max-width:680px;margin:0 auto;}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 5px rgba(0,0,0,.07);margin-bottom:14px;overflow:hidden;}
+.card-hdr{padding:11px 15px;background:#f8fafc;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-ttl{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+.card-bd{padding:13px 15px;}
+
+/* Fields */
+.frow{margin-bottom:11px;} .frow:last-child{margin-bottom:0;}
+.flbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:4px;}
+.finp{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:15px;color:var(--text);background:#fff;outline:none;-webkit-appearance:none;font-family:inherit;}
+.finp:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(234,88,12,.1);}
+select.finp{cursor:pointer;}
+textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fgrid .frow{margin-bottom:0;}
+
+/* Mic button */
+.notes-wrap{position:relative;}
+.mic-btn{position:absolute;bottom:8px;right:8px;background:var(--brand);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;box-shadow:0 2px 6px rgba(234,88,12,.4);transition:background .15s,transform .1s;z-index:2;}
+.mic-btn:active{transform:scale(.93);}
+.mic-btn.listening{background:var(--red);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.5);}50%{box-shadow:0 0 0 8px rgba(220,38,38,0);}}
+#mic-interim{font-size:12px;color:var(--muted);font-style:italic;margin-top:4px;min-height:16px;padding:0 2px;}
+
+/* Item tables */
+.itbl{width:100%;border-collapse:collapse;}
+.itbl th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);text-align:left;padding:7px 6px;border-bottom:1.5px solid var(--border);background:#f8fafc;white-space:nowrap;}
+.itbl td{padding:5px 3px;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+.itbl tr:last-child td{border-bottom:none;}
+.iinp{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:6px 7px;font-size:13px;color:var(--text);background:#fff;outline:none;font-family:inherit;}
+.iinp:focus{border-color:var(--brand);}
+.iinp.qty{width:50px;text-align:center;}
+.iinp.price{width:80px;text-align:right;}
+.irow-tot{font-size:13px;font-weight:700;text-align:right;padding:0 6px;min-width:68px;white-space:nowrap;}
+.del-btn{background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:20px;line-height:1;padding:0 4px;}
+.del-btn:active{color:var(--red);}
+.lkp-btn{background:none;border:none;cursor:pointer;color:#94a3b8;font-size:14px;line-height:1;padding:0 3px;}
+.lkp-btn:active{color:var(--brand);}
+
+/* Add & Quick Pick */
+.tbl-actions{padding:8px 13px 13px;display:flex;flex-direction:column;gap:6px;}
+.add-item-btn{display:flex;align-items:center;gap:6px;background:none;border:1.5px dashed #cbd5e1;border-radius:8px;padding:9px 13px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;width:100%;}
+.add-item-btn:active{border-color:var(--brand);color:var(--brand);}
+.quick-toggle{display:flex;align-items:center;gap:6px;background:#f1f5f9;border:1.5px solid var(--border);border-radius:8px;padding:8px 13px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;width:100%;}
+.quick-toggle:active{background:#e2e8f0;}
+.quick-panel{background:#f8fafc;border-top:1px solid var(--border);padding:10px 13px 12px;display:none;}
+.quick-panel.open{display:block;}
+.qg-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:8px 0 5px;}
+.qg-lbl:first-child{margin-top:0;}
+.chips{display:flex;flex-wrap:wrap;gap:5px;}
+.chip{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;white-space:nowrap;}
+.chip:active{background:var(--brand);border-color:var(--brand);color:#fff;}
+
+/* Pricing rows */
+.prow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f1f5f9;}
+.prow:last-child{border-bottom:none;}
+.plbl{flex:1;font-size:14px;color:var(--text);}
+.plbl.bold{font-weight:700;}
+.plbl.sm{font-size:12px;color:var(--muted);}
+.pinp{width:108px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:14px;font-weight:700;text-align:right;color:var(--text);outline:none;background:#fff;-webkit-appearance:none;font-family:inherit;}
+.pinp:focus{border-color:var(--brand);}
+.pval{font-size:15px;font-weight:800;min-width:85px;text-align:right;white-space:nowrap;}
+.pval.big{color:var(--brand);font-size:18px;}
+.chk-lbl{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;user-select:none;}
+.chk-lbl input[type=checkbox]{accent-color:var(--brand);cursor:pointer;width:15px;height:15px;}
+.mode-tog{display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;flex-shrink:0;}
+.mbtn{flex:1;background:none;border:none;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);}
+.mbtn.on{background:var(--brand);color:#fff;}
+.auto-badge{font-size:10px;font-weight:700;background:#fef3c7;color:var(--yellow);border-radius:4px;padding:1px 5px;margin-left:4px;}
+
+/* Summary */
+.sline{display:flex;align-items:baseline;gap:8px;padding:7px 0;}
+.sline:not(:last-child){border-bottom:1px solid #f1f5f9;}
+.slbl{flex:1;font-size:14px;color:var(--muted);}
+.slbl.bold{font-weight:700;color:var(--text);}
+.slbl.indent{font-size:12px;padding-left:14px;}
+.sval{font-size:15px;font-weight:700;color:var(--text);text-align:right;}
+.sval.big-green{color:var(--green);font-size:20px;}
+.sval.brand{color:var(--brand);font-size:22px;font-weight:800;}
+.sval.muted{color:var(--muted);font-size:14px;}
+
+/* Grand total banner */
+.gt-banner{background:linear-gradient(135deg,#7c2d12 0%,var(--brand) 55%,var(--brand-lt) 100%);border-radius:12px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;color:#fff;box-shadow:0 4px 14px rgba(234,88,12,.4);}
+.gt-lbl{font-size:12px;font-weight:700;opacity:.8;margin-bottom:2px;}
+.gt-amt{font-size:30px;font-weight:800;letter-spacing:-.5px;}
+.gt-right{text-align:right;}
+.gt-margin{font-size:24px;font-weight:800;}
+
+/* Profit bar */
+.pbar{height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin:10px 0 4px;}
+.pfill{height:100%;border-radius:4px;transition:width .4s ease,background .4s ease;}
+
+/* Bottom bar */
+#bot-bar{position:fixed;bottom:0;left:0;right:0;z-index:90;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:10px 14px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));display:none;gap:8px;max-width:680px;margin:0 auto;}
+.abtn{flex:1;padding:13px;border-radius:10px;border:none;font-size:15px;font-weight:700;cursor:pointer;}
+.abtn:active{filter:brightness(.9);}
+.abtn.primary{background:var(--brand);color:#fff;}
+.abtn.secondary{background:#f1f5f9;color:var(--text);}
+
+/* Share modal */
+#share-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);padding:16px;align-items:flex-end;justify-content:center;}
+#share-modal.on{display:flex;}
+#share-box{background:#fff;border-radius:16px;width:100%;max-width:540px;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.3);}
+.sm-hdr{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.sm-hdr h2{font-size:16px;font-weight:700;}
+.sm-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1;padding:0 4px;}
+#share-txt{flex:1;overflow:auto;padding:14px;font-family:'SF Mono','Fira Mono',monospace;font-size:12px;white-space:pre;background:#f8fafc;outline:none;resize:none;width:100%;border:none;color:#1e293b;line-height:1.6;}
+.sm-foot{padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
+
+@media print{
+  #hdr,#bot-bar,#share-modal{display:none!important;}
+  .card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid;}
+  body,#edit-view{background:#fff!important;padding:0!important;}
+  .gt-banner{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .quick-panel,.tbl-actions{display:none!important;}
+}
+@media(max-width:480px){
+  .fgrid{grid-template-columns:1fr;}
+  .gt-amt{font-size:24px;} .gt-margin{font-size:20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div id="hdr">
+  <div id="hdr-title">🏗️ Estimates</div>
+  <div id="hdr-r">
+    <button class="hbtn" id="share-btn" onclick="showShare()">Share</button>
+    <button class="hbtn" id="print-btn" onclick="window.print()">Print</button>
+    <button class="hbtn" id="back-btn" onclick="goList()">← Back</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     LIST VIEW
+═══════════════════════════════════════ -->
+<div id="list-view" class="view on">
+  <div id="list-wrap">
+    <button class="new-est-btn" onclick="newEst()">＋ New Estimate</button>
+    <div id="est-list"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     EDIT VIEW
+═══════════════════════════════════════ -->
+<div id="edit-view" class="view">
+
+  <!-- Project Info -->
+  <div class="card">
+    <div class="card-hdr"><span class="card-ttl">📋 Project Info</span></div>
+    <div class="card-bd">
+      <div class="fgrid">
+        <div class="frow">
+          <label class="flbl">Job Name</label>
+          <input class="finp" id="f-client" placeholder="Job name" oninput="sv()"/>
+        </div>
+        <div class="frow">
+          <label class="flbl">Project Manager</label>
+          <select class="finp" id="f-pm" onchange="onPMChange()">
+            <option value="">Select PM...</option>
+            <option value="Keri">Keri</option>
+            <option value="Jake">Jake</option>
+            <option value="Mark">Mark</option>
+            <option value="Jason">Jason</option>
+            <option value="David">David</option>
+            <option value="Sarah">Sarah</option>
+            <option value="Mike">Mike</option>
+            <option value="Chris">Chris</option>
+            <option value="__other__">Other...</option>
+          </select>
+          <input class="finp" id="f-pm-other" placeholder="PM name" oninput="sv()" style="display:none;margin-top:6px;"/>
+        </div>
+      </div>
+      <div class="frow" style="margin-top:11px;">
+        <label class="flbl">Status</label>
+        <select class="finp" id="f-status" onchange="sv()">
+          <option value="draft">🟡 Draft</option>
+          <option value="sent">🔵 Sent</option>
+          <option value="approved">🟢 Approved</option>
+          <option value="completed">✅ Completed</option>
+        </select>
+      </div>
+      <div class="frow" style="margin-top:11px;">
+        <label class="flbl">Job Notes</label>
+        <div class="notes-wrap">
+          <textarea class="finp" id="f-notes" placeholder="Tap 🎤 to dictate or type notes here..." style="padding-bottom:48px;" oninput="sv()"></textarea>
+          <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Tap to dictate">🎤</button>
+        </div>
+        <div id="mic-interim"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lumber -->
+  <div class="card">
+    <div class="card-hdr">
+      <span class="card-ttl">🪵 Lumber</span>
+      <span id="lumber-sub-lbl" style="font-size:13px;font-weight:800;color:var(--brand)"></span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="itbl">
+        <thead><tr>
+          <th style="padding-left:13px;width:54px;">Qty</th>
+          <th>Description</th>
+          <th style="width:88px;">Unit $</th>
+          <th style="width:74px;text-align:right;padding-right:8px;">Total</th>
+          <th style="width:52px;"></th>
+        </tr></thead>
+        <tbody id="lumber-tb"></tbody>
+      </table>
+    </div>
+    <div class="tbl-actions">
+      <button class="add-item-btn" onclick="addItem('lumber')">＋ Add item</button>
+      <button class="quick-toggle" id="lumber-qt" onclick="toggleQuick('lumber')">⚡ Quick Pick Lumber ▾</button>
+    </div>
+    <div class="quick-panel" id="lumber-qp">
+      <div class="qg-lbl">2×4</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('lumber','2x4 x8')">x8</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 x10')">x10</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 x12')">x12</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 x16')">x16</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 x20')">x20</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 x12 PT')">x12 PT</button>
+        <button class="chip" onclick="quickAdd('lumber','2x4 x16 PT')">x16 PT</button>
+      </div>
+      <div class="qg-lbl">2×6</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('lumber','2x6 x8')">x8</button>
+        <button class="chip" onclick="quickAdd('lumber','2x6 x10')">x10</button>
+        <button class="chip" onclick="quickAdd('lumber','2x6 x12')">x12</button>
+        <button class="chip" onclick="quickAdd('lumber','2x6 x16')">x16</button>
+        <button class="chip" onclick="quickAdd('lumber','2x6 x20')">x20</button>
+      </div>
+      <div class="qg-lbl">2×8</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('lumber','2x8 x8')">x8</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 x10')">x10</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 x12')">x12</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 x14')">x14</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 x16')">x16</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 x18')">x18</button>
+        <button class="chip" onclick="quickAdd('lumber','2x8 x20')">x20</button>
+      </div>
+      <div class="qg-lbl">2×10</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('lumber','2x10 x8')">x8</button>
+        <button class="chip" onclick="quickAdd('lumber','2x10 x12')">x12</button>
+        <button class="chip" onclick="quickAdd('lumber','2x10 x16')">x16</button>
+        <button class="chip" onclick="quickAdd('lumber','2x10 x20')">x20</button>
+      </div>
+      <div class="qg-lbl">2×12</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('lumber','2x12 x8')">x8</button>
+        <button class="chip" onclick="quickAdd('lumber','2x12 x12')">x12</button>
+        <button class="chip" onclick="quickAdd('lumber','2x12 x16')">x16</button>
+        <button class="chip" onclick="quickAdd('lumber','2x12 x20')">x20</button>
+      </div>
+      <div class="qg-lbl">Posts &amp; Beams</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('lumber','4x4 x8')">4x4 x8</button>
+        <button class="chip" onclick="quickAdd('lumber','4x4 x10')">4x4 x10</button>
+        <button class="chip" onclick="quickAdd('lumber','4x4 x12')">4x4 x12</button>
+        <button class="chip" onclick="quickAdd('lumber','4x6 x8')">4x6 x8</button>
+        <button class="chip" onclick="quickAdd('lumber','4x6 x10')">4x6 x10</button>
+        <button class="chip" onclick="quickAdd('lumber','6x6 x8')">6x6 x8</button>
+        <button class="chip" onclick="quickAdd('lumber','6x6 x10')">6x6 x10</button>
+      </div>
+      <div class="qg-lbl">Glulam Beams (GLB)</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('lumber','3½×12&quot; GLB 10\'')">3½×12 10'</button>
+        <button class="chip" onclick="quickAdd('lumber','3½×12&quot; GLB 12\'')">3½×12 12'</button>
+        <button class="chip" onclick="quickAdd('lumber','3½×12&quot; GLB 16\'')">3½×12 16'</button>
+        <button class="chip" onclick="quickAdd('lumber','3½×12&quot; GLB 20\'')">3½×12 20'</button>
+        <button class="chip" onclick="quickAdd('lumber','3½×14&quot; GLB 16\'')">3½×14 16'</button>
+        <button class="chip" onclick="quickAdd('lumber','3½×14&quot; GLB 20\'')">3½×14 20'</button>
+        <button class="chip" onclick="quickAdd('lumber','5¼×12&quot; GLB 16\'')">5¼×12 16'</button>
+      </div>
+      <div class="qg-lbl">Panels / Sheathing</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('lumber','7/16 OSB')">7/16 OSB</button>
+        <button class="chip" onclick="quickAdd('lumber','15/32 OSB')">15/32 OSB</button>
+        <button class="chip" onclick="quickAdd('lumber','1/2 Plywood')">1/2 Ply</button>
+        <button class="chip" onclick="quickAdd('lumber','5/8 Plywood')">5/8 Ply</button>
+        <button class="chip" onclick="quickAdd('lumber','3/4 Plywood')">3/4 Ply</button>
+        <button class="chip" onclick="quickAdd('lumber','T&amp;G 3/4 Plywood')">T&amp;G 3/4</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hardware -->
+  <div class="card">
+    <div class="card-hdr">
+      <span class="card-ttl">🔩 Hardware</span>
+      <span id="hardware-sub-lbl" style="font-size:13px;font-weight:800;color:var(--brand)"></span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="itbl">
+        <thead><tr>
+          <th style="padding-left:13px;width:54px;">Qty</th>
+          <th>Description</th>
+          <th style="width:88px;">Unit $</th>
+          <th style="width:74px;text-align:right;padding-right:8px;">Total</th>
+          <th style="width:52px;"></th>
+        </tr></thead>
+        <tbody id="hardware-tb"></tbody>
+      </table>
+    </div>
+    <div class="tbl-actions">
+      <button class="add-item-btn" onclick="addItem('hardware')">＋ Add item</button>
+      <button class="quick-toggle" id="hardware-qt" onclick="toggleQuick('hardware')">⚡ Quick Pick Hardware ▾</button>
+    </div>
+    <div class="quick-panel" id="hardware-qp">
+      <div class="qg-lbl">Hurricane &amp; Rafter Ties</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('hardware','H1')">H1</button>
+        <button class="chip" onclick="quickAdd('hardware','H2.5')">H2.5</button>
+        <button class="chip" onclick="quickAdd('hardware','H3')">H3</button>
+        <button class="chip" onclick="quickAdd('hardware','H3L')">H3L</button>
+        <button class="chip" onclick="quickAdd('hardware','HGA10')">HGA10</button>
+        <button class="chip" onclick="quickAdd('hardware','TA9')">TA9</button>
+        <button class="chip" onclick="quickAdd('hardware','LSTA18')">LSTA18</button>
+      </div>
+      <div class="qg-lbl">Angle Brackets</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('hardware','A35')">A35</button>
+        <button class="chip" onclick="quickAdd('hardware','A35T')">A35T</button>
+        <button class="chip" onclick="quickAdd('hardware','A34')">A34</button>
+        <button class="chip" onclick="quickAdd('hardware','LA')">LA</button>
+      </div>
+      <div class="qg-lbl">Joist Hangers</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('hardware','LUS24')">LUS24</button>
+        <button class="chip" onclick="quickAdd('hardware','LUS26')">LUS26</button>
+        <button class="chip" onclick="quickAdd('hardware','LUS28')">LUS28</button>
+        <button class="chip" onclick="quickAdd('hardware','LUS210')">LUS210</button>
+        <button class="chip" onclick="quickAdd('hardware','IUS24')">IUS24</button>
+        <button class="chip" onclick="quickAdd('hardware','IUS26')">IUS26</button>
+        <button class="chip" onclick="quickAdd('hardware','LSSU26')">LSSU26</button>
+        <button class="chip" onclick="quickAdd('hardware','LSSU28')">LSSU28</button>
+      </div>
+      <div class="qg-lbl">Post Caps &amp; Bases</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('hardware','AC4')">AC4</button>
+        <button class="chip" onclick="quickAdd('hardware','AC6')">AC6</button>
+        <button class="chip" onclick="quickAdd('hardware','BC4')">BC4</button>
+        <button class="chip" onclick="quickAdd('hardware','BC6')">BC6</button>
+        <button class="chip" onclick="quickAdd('hardware','PC4')">PC4</button>
+        <button class="chip" onclick="quickAdd('hardware','PC6')">PC6</button>
+        <button class="chip" onclick="quickAdd('hardware','ABA46')">ABA46</button>
+        <button class="chip" onclick="quickAdd('hardware','ABU46')">ABU46</button>
+      </div>
+      <div class="qg-lbl">Anchor Bolts</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('hardware','1/2&quot; Wedge Anchor')">½" Wedge</button>
+        <button class="chip" onclick="quickAdd('hardware','5/8&quot; Wedge Anchor')">⅝" Wedge</button>
+        <button class="chip" onclick="quickAdd('hardware','3/4&quot; Wedge Anchor')">¾" Wedge</button>
+        <button class="chip" onclick="quickAdd('hardware','4&quot; Square Washer Plate')">4" Washer</button>
+      </div>
+      <div class="qg-lbl">Screws &amp; Fasteners</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('hardware','SDWS16300')">SDWS16300</button>
+        <button class="chip" onclick="quickAdd('hardware','SDWS15300')">SDWS15300</button>
+        <button class="chip" onclick="quickAdd('hardware','SDS25300')">SDS25300</button>
+        <button class="chip" onclick="quickAdd('hardware','SDS25400')">SDS25400</button>
+        <button class="chip" onclick="quickAdd('hardware','16d Framing Nails')">16d Nails</button>
+        <button class="chip" onclick="quickAdd('hardware','10d Nails')">10d Nails</button>
+        <button class="chip" onclick="quickAdd('hardware','1.5&quot; Joist Hanger Nails')">1.5" JH Nails</button>
+      </div>
+      <div class="qg-lbl">Straps</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAdd('hardware','CS16')">CS16</button>
+        <button class="chip" onclick="quickAdd('hardware','CS20')">CS20</button>
+        <button class="chip" onclick="quickAdd('hardware','MSTA24')">MSTA24</button>
+        <button class="chip" onclick="quickAdd('hardware','MSTA36')">MSTA36</button>
+        <button class="chip" onclick="quickAdd('hardware','MST27')">MST27</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Materials Pricing -->
+  <div class="card">
+    <div class="card-hdr"><span class="card-ttl">💰 Materials Pricing</span></div>
+    <div class="card-bd">
+
+      <div class="prow">
+        <div class="plbl">Vendor Subtotal</div>
+        <label class="chk-lbl"><input type="checkbox" id="auto-vendor" checked onchange="sv();rc()"/> Auto</label>
+        <div class="pval" id="vendor-disp">$0</div>
+      </div>
+      <div class="prow" id="vendor-or-row" style="display:none;">
+        <div class="plbl sm">Override amount</div>
+        <input class="pinp" id="vendor-or" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+      </div>
+
+      <div class="prow">
+        <div class="plbl">Taxes <span class="auto-badge" id="tax-auto-badge" style="display:none;">Utah 7.25%</span></div>
+        <label class="chk-lbl"><input type="checkbox" id="tax-inc" checked onchange="onTaxChange()"/> Included</label>
+        <input class="pinp" id="tax-amt" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()" style="display:none;"/>
+      </div>
+
+      <div class="prow">
+        <div class="plbl">Upcharge <span class="auto-badge">20% default</span></div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div class="mode-tog">
+            <button class="mbtn" id="uc-dollar" onclick="setUCMode('$')">$</button>
+            <button class="mbtn on" id="uc-pct" onclick="setUCMode('%')">%</button>
+          </div>
+          <input class="pinp" id="uc-val" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()" style="width:88px;"/>
+        </div>
+      </div>
+      <div id="uc-hint" style="font-size:11px;color:var(--muted);text-align:right;padding:2px 0 4px;display:none;"></div>
+
+      <div class="prow">
+        <div class="plbl">Buffer <span class="auto-badge">$300 default</span></div>
+        <input class="pinp" id="buf-val" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+      </div>
+
+      <div class="prow">
+        <div class="plbl">Delivery <span class="auto-badge" id="del-auto-badge" style="display:none;">$100</span></div>
+        <label class="chk-lbl"><input type="checkbox" id="del-inc" checked onchange="onDelChange()"/> Included</label>
+        <input class="pinp" id="del-amt" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()" style="display:none;"/>
+      </div>
+
+      <div class="prow" style="padding-top:13px;margin-top:6px;border-top:2px solid var(--border);">
+        <div class="plbl bold">Client Materials Total</div>
+        <div class="pval big" id="client-mat-total">$0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Labor -->
+  <div class="card">
+    <div class="card-hdr"><span class="card-ttl">👷 Labor</span></div>
+    <div class="card-bd">
+      <div class="fgrid" style="margin-bottom:13px;">
+        <div class="frow">
+          <label class="flbl">Sub Name</label>
+          <input class="finp" id="sub-name" placeholder="Sub name" oninput="sv()"/>
+        </div>
+        <div class="frow">
+          <label class="flbl">Days</label>
+          <input class="finp" id="sub-days" placeholder="3-4 days" oninput="sv()"/>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:6px;">Our Costs</div>
+      <div class="prow">
+        <div class="plbl">Sub Labor Cost</div>
+        <input class="pinp" id="sub-cost" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+      </div>
+      <div class="prow">
+        <div class="plbl">Sub Demo Cost</div>
+        <input class="pinp" id="sub-demo" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+      </div>
+      <div style="border-top:1.5px dashed var(--border);margin:10px 0;"></div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:6px;">We Charge Client</div>
+      <div class="prow">
+        <div class="plbl bold">Labor charge</div>
+        <input class="pinp" id="cli-labor" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+      </div>
+      <div class="prow">
+        <div class="plbl bold">Demo charge</div>
+        <input class="pinp" id="cli-demo" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Other Expenses -->
+  <div class="card">
+    <div class="card-hdr"><span class="card-ttl">🧾 Other Expenses</span></div>
+    <div class="card-bd">
+      <div class="prow" style="border-bottom:none;">
+        <div class="plbl">My Expenses</div>
+        <input class="pinp" id="my-exp" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grand Total Banner -->
+  <div class="gt-banner">
+    <div>
+      <div class="gt-lbl">Grand Total (Client)</div>
+      <div class="gt-amt" id="gt-amount">$0</div>
+    </div>
+    <div class="gt-right">
+      <div class="gt-lbl">Profit Margin</div>
+      <div class="gt-margin" id="gt-margin">—</div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="card">
+    <div class="card-hdr"><span class="card-ttl">📊 Summary</span></div>
+    <div class="card-bd">
+      <div class="sline"><div class="slbl">Client Materials</div><div class="sval" id="s-mat"></div></div>
+      <div class="sline"><div class="slbl">Client Labor + Demo</div><div class="sval" id="s-lab"></div></div>
+      <div class="sline" style="border-top:2px solid var(--border);margin-top:4px;padding-top:10px;">
+        <div class="slbl bold" style="font-size:16px;">Grand Total</div>
+        <div class="sval brand" id="s-gt"></div>
+      </div>
+      <div style="height:14px;"></div>
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:6px;">Expenses</div>
+      <div class="sline"><div class="slbl indent">Vendor Materials</div><div class="sval muted" id="s-e-mat"></div></div>
+      <div class="sline"><div class="slbl indent">Sub Labor + Demo</div><div class="sval muted" id="s-e-lab"></div></div>
+      <div class="sline"><div class="slbl indent">My Expenses</div><div class="sval muted" id="s-e-me"></div></div>
+      <div class="sline" style="border-top:2px solid var(--border);margin-top:4px;padding-top:10px;">
+        <div class="slbl bold">Total Expenses</div><div class="sval" id="s-exp"></div>
+      </div>
+      <div class="sline" style="border-top:2px solid var(--border);margin-top:4px;padding-top:10px;">
+        <div class="slbl bold" style="font-size:16px;">Profit</div>
+        <div class="sval big-green" id="s-profit"></div>
+      </div>
+      <div class="pbar"><div class="pfill" id="pbar-fill"></div></div>
+      <div style="text-align:center;font-size:12px;color:var(--muted);" id="pbar-lbl"></div>
+    </div>
+  </div>
+
+</div><!-- /edit-view -->
+
+<!-- ── Bottom Bar ── -->
+<div id="bot-bar">
+  <button class="abtn secondary" onclick="delEst()">🗑 Delete</button>
+  <button class="abtn primary" onclick="goList()">✓ Save &amp; Back</button>
+</div>
+
+<!-- ── Share Modal ── -->
+<div id="share-modal">
+  <div id="share-box">
+    <div class="sm-hdr">
+      <h2>Share Estimate</h2>
+      <button class="sm-close" onclick="closeShare()">×</button>
+    </div>
+    <textarea id="share-txt" readonly></textarea>
+    <div class="sm-foot">
+      <button class="abtn secondary" id="copy-btn" onclick="copyShare()" style="flex:1;">📋 Copy</button>
+      <button class="abtn primary" onclick="closeShare()" style="flex:1;">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+const STORE_KEY = 'est-builder-v4';
+let db = { ests: [], cur: null };
+
+function dbLoad() {
+  try { db = JSON.parse(localStorage.getItem(STORE_KEY)) || { ests: [], cur: null }; }
+  catch(e) { db = { ests: [], cur: null }; }
+}
+function dbSave() { try { localStorage.setItem(STORE_KEY, JSON.stringify(db)); } catch(e) {} }
+
+/* ══════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════ */
+const fmt = n => '$' + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const getEst = id => db.ests.find(e => e.id === id);
+
+function getVendorSub() {
+  const e = getEst(db.cur);
+  if (!e) return 0;
+  const p = e.pr || {};
+  const iS = arr => (arr || []).reduce((s, it) => s + (parseFloat(it.qty) || 0) * (parseFloat(it.unitPrice) || 0), 0);
+  return p.auto !== false ? iS(e.lumber) + iS(e.hardware) : (p.orv || 0);
+}
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function goList() {
+  stopMic();
+  document.getElementById('list-view').classList.add('on');
+  document.getElementById('edit-view').classList.remove('on');
+  document.getElementById('bot-bar').style.display = 'none';
+  document.getElementById('hdr-title').textContent = '🏗️ Estimates';
+  ['back-btn','print-btn','share-btn'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+  renderList();
+}
+
+function goEdit(id) {
+  db.cur = id;
+  document.getElementById('list-view').classList.remove('on');
+  document.getElementById('edit-view').classList.add('on');
+  document.getElementById('bot-bar').style.display = 'flex';
+  ['back-btn','print-btn','share-btn'].forEach(id2 => { document.getElementById(id2).style.display = 'block'; });
+  loadForm(id);
+  window.scrollTo(0, 0);
+}
+
+/* ══════════════════════════════════════════
+   CRUD
+══════════════════════════════════════════ */
+function newEst() {
+  const id = uid();
+  db.ests.unshift({
+    id,
+    client: '', pm: '', pmOther: '',
+    status: 'draft', notes: '',
+    lumber: [], hardware: [],
+    pr: { auto: true, orv: 0, taxInc: true, tax: 0, ucMode: '%', ucVal: 20, buf: 300, delInc: true, del: 0 },
+    lb: { name: '', days: '', subCost: 0, subDemo: 0, cliLab: 0, cliDemo: 0 },
+    myExp: 0
+  });
+  dbSave();
+  goEdit(id);
+}
+
+function delEst() {
+  if (!confirm('Delete this estimate?')) return;
+  db.ests = db.ests.filter(e => e.id !== db.cur);
+  db.cur = null; dbSave(); goList();
+}
+
+/* ══════════════════════════════════════════
+   LOAD FORM
+══════════════════════════════════════════ */
+function loadForm(id) {
+  const e = getEst(id);
+  if (!e) return;
+  document.getElementById('hdr-title').textContent = e.client || 'New Estimate';
+  document.getElementById('f-client').value = e.client || '';
+
+  // PM dropdown
+  const pmSel = document.getElementById('f-pm');
+  const pmOther = document.getElementById('f-pm-other');
+  if (e.pmOther) {
+    pmSel.value = '__other__';
+    pmOther.style.display = 'block';
+    pmOther.value = e.pmOther;
+  } else {
+    pmSel.value = e.pm || '';
+    pmOther.style.display = 'none';
+    pmOther.value = '';
+  }
+
+  document.getElementById('f-status').value = e.status || 'draft';
+  document.getElementById('f-notes').value = e.notes || '';
+
+  const p = e.pr || {};
+  const autoV = p.auto !== false;
+  document.getElementById('auto-vendor').checked = autoV;
+  document.getElementById('vendor-or-row').style.display = autoV ? 'none' : 'flex';
+  document.getElementById('vendor-or').value = p.orv || '';
+  document.getElementById('tax-inc').checked = p.taxInc !== false;
+  document.getElementById('tax-amt').style.display = p.taxInc !== false ? 'none' : 'block';
+  document.getElementById('tax-auto-badge').style.display = p.taxInc !== false ? 'none' : 'inline';
+  document.getElementById('tax-amt').value = p.tax || '';
+  document.getElementById('uc-val').value = p.ucVal !== undefined ? p.ucVal : 20;
+  setUCMode(p.ucMode || '%', false);
+  document.getElementById('buf-val').value = p.buf !== undefined ? p.buf : 300;
+  document.getElementById('del-inc').checked = p.delInc !== false;
+  document.getElementById('del-amt').style.display = p.delInc !== false ? 'none' : 'block';
+  document.getElementById('del-auto-badge').style.display = p.delInc !== false ? 'none' : 'inline';
+  document.getElementById('del-amt').value = p.del || '';
+
+  const l = e.lb || {};
+  document.getElementById('sub-name').value = l.name || '';
+  document.getElementById('sub-days').value = l.days || '';
+  document.getElementById('sub-cost').value = l.subCost || '';
+  document.getElementById('sub-demo').value = l.subDemo || '';
+  document.getElementById('cli-labor').value = l.cliLab || '';
+  document.getElementById('cli-demo').value = l.cliDemo || '';
+  document.getElementById('my-exp').value = e.myExp || '';
+
+  renderItems('lumber', e.lumber || []);
+  renderItems('hardware', e.hardware || []);
+  rc();
+}
+
+/* ══════════════════════════════════════════
+   SAVE FORM → STATE
+══════════════════════════════════════════ */
+function sv() {
+  const e = getEst(db.cur);
+  if (!e) return;
+
+  e.client = document.getElementById('f-client').value;
+  const pmSel = document.getElementById('f-pm');
+  if (pmSel.value === '__other__') {
+    e.pm = '';
+    e.pmOther = document.getElementById('f-pm-other').value;
+  } else {
+    e.pm = pmSel.value;
+    e.pmOther = '';
+  }
+  e.status = document.getElementById('f-status').value;
+  e.notes = document.getElementById('f-notes').value;
+  document.getElementById('hdr-title').textContent = e.client || 'New Estimate';
+
+  const autoV = document.getElementById('auto-vendor').checked;
+  document.getElementById('vendor-or-row').style.display = autoV ? 'none' : 'flex';
+
+  e.pr = {
+    auto: autoV,
+    orv: parseFloat(document.getElementById('vendor-or').value) || 0,
+    taxInc: document.getElementById('tax-inc').checked,
+    tax: parseFloat(document.getElementById('tax-amt').value) || 0,
+    ucMode: (e.pr && e.pr.ucMode) || '%',
+    ucVal: parseFloat(document.getElementById('uc-val').value) || 0,
+    buf: parseFloat(document.getElementById('buf-val').value) || 0,
+    delInc: document.getElementById('del-inc').checked,
+    del: parseFloat(document.getElementById('del-amt').value) || 0
+  };
+
+  e.lb = {
+    name: document.getElementById('sub-name').value,
+    days: document.getElementById('sub-days').value,
+    subCost: parseFloat(document.getElementById('sub-cost').value) || 0,
+    subDemo: parseFloat(document.getElementById('sub-demo').value) || 0,
+    cliLab: parseFloat(document.getElementById('cli-labor').value) || 0,
+    cliDemo: parseFloat(document.getElementById('cli-demo').value) || 0
+  };
+  e.myExp = parseFloat(document.getElementById('my-exp').value) || 0;
+  dbSave();
+}
+
+/* ══════════════════════════════════════════
+   AUTO-FILL HANDLERS
+══════════════════════════════════════════ */
+function onPMChange() {
+  const sel = document.getElementById('f-pm');
+  const otherInput = document.getElementById('f-pm-other');
+  otherInput.style.display = sel.value === '__other__' ? 'block' : 'none';
+  if (sel.value === '__other__') otherInput.focus();
+  sv();
+}
+
+function onTaxChange() {
+  const taxInc = document.getElementById('tax-inc').checked;
+  const taxAmt = document.getElementById('tax-amt');
+  const badge = document.getElementById('tax-auto-badge');
+  taxAmt.style.display = taxInc ? 'none' : 'block';
+  badge.style.display = taxInc ? 'none' : 'inline';
+  if (!taxInc) {
+    const vS = getVendorSub();
+    const autoTax = Math.round(vS * 0.0725);
+    taxAmt.value = autoTax || '';
+  }
+  sv(); rc();
+}
+
+function onDelChange() {
+  const delInc = document.getElementById('del-inc').checked;
+  const delAmt = document.getElementById('del-amt');
+  const badge = document.getElementById('del-auto-badge');
+  delAmt.style.display = delInc ? 'none' : 'block';
+  badge.style.display = delInc ? 'none' : 'inline';
+  if (!delInc && !delAmt.value) {
+    delAmt.value = 100;
+  }
+  sv(); rc();
+}
+
+/* ══════════════════════════════════════════
+   UC MODE
+══════════════════════════════════════════ */
+function setUCMode(m, doSave = true) {
+  const e = getEst(db.cur);
+  if (e) e.pr = { ...(e.pr || {}), ucMode: m };
+  document.getElementById('uc-dollar').classList.toggle('on', m === '$');
+  document.getElementById('uc-pct').classList.toggle('on', m === '%');
+  if (doSave) { dbSave(); rc(); }
+}
+
+/* ══════════════════════════════════════════
+   RECALCULATE
+══════════════════════════════════════════ */
+function rc() {
+  const e = getEst(db.cur);
+  if (!e) return;
+
+  const iS = arr => (arr || []).reduce((s, it) => s + (parseFloat(it.qty) || 0) * (parseFloat(it.unitPrice) || 0), 0);
+  const lSub = iS(e.lumber), hSub = iS(e.hardware);
+  document.getElementById('lumber-sub-lbl').textContent = lSub > 0 ? fmt(lSub) : '';
+  document.getElementById('hardware-sub-lbl').textContent = hSub > 0 ? fmt(hSub) : '';
+
+  const p = e.pr || {};
+  const vendSub = p.auto !== false ? lSub + hSub : (p.orv || 0);
+  document.getElementById('vendor-disp').textContent = fmt(vendSub);
+
+  const ucVal = p.ucVal || 0, ucMode = p.ucMode || '%';
+  const ucAmt = ucMode === '%' ? vendSub * (ucVal / 100) : ucVal;
+  const hint = document.getElementById('uc-hint');
+  if (ucMode === '%' && ucVal > 0) {
+    hint.style.display = 'block';
+    hint.textContent = `${ucVal}% of ${fmt(vendSub)} = ${fmt(ucAmt)}`;
+  } else hint.style.display = 'none';
+
+  const taxAmt = p.taxInc ? 0 : (p.tax || 0);
+  const delAmt = p.delInc ? 0 : (p.del || 0);
+  const bufAmt = p.buf || 0;
+  const clientMat = vendSub + ucAmt + taxAmt + bufAmt + delAmt;
+  document.getElementById('client-mat-total').textContent = fmt(clientMat);
+
+  const l = e.lb || {};
+  const cliLabTotal = (l.cliLab || 0) + (l.cliDemo || 0);
+  const subLabTotal = (l.subCost || 0) + (l.subDemo || 0);
+  const grandTotal = clientMat + cliLabTotal;
+  const expenses = vendSub + subLabTotal + (e.myExp || 0);
+  const profit = grandTotal - expenses;
+  const margin = grandTotal > 0 ? (profit / grandTotal) * 100 : 0;
+
+  document.getElementById('gt-amount').textContent = fmt(grandTotal);
+  document.getElementById('gt-margin').textContent = grandTotal > 0 ? margin.toFixed(1) + '%' : '—';
+  document.getElementById('s-mat').textContent = fmt(clientMat);
+  document.getElementById('s-lab').textContent = fmt(cliLabTotal);
+  document.getElementById('s-gt').textContent = fmt(grandTotal);
+  document.getElementById('s-e-mat').textContent = fmt(vendSub);
+  document.getElementById('s-e-lab').textContent = fmt(subLabTotal);
+  document.getElementById('s-e-me').textContent = fmt(e.myExp || 0);
+  document.getElementById('s-exp').textContent = fmt(expenses);
+  document.getElementById('s-profit').textContent = fmt(profit);
+
+  const pct = Math.max(0, Math.min(100, margin));
+  const fill = document.getElementById('pbar-fill');
+  fill.style.width = pct + '%';
+  fill.style.background = margin >= 40 ? '#16a34a' : margin >= 25 ? '#ca8a04' : '#dc2626';
+  document.getElementById('pbar-lbl').textContent = grandTotal > 0 ? margin.toFixed(1) + '% profit margin' : '';
+}
+
+/* ══════════════════════════════════════════
+   LINE ITEMS
+══════════════════════════════════════════ */
+function renderItems(type, arr) {
+  const tb = document.getElementById(`${type}-tb`);
+  tb.innerHTML = arr.map((it, i) => {
+    const q = parseFloat(it.qty) || 0, u = parseFloat(it.unitPrice) || 0;
+    const totHtml = (q && u) ? `<span style="color:var(--text)">${fmt(q*u)}</span>` : `<span style="color:#e2e8f0">—</span>`;
+    return `<tr>
+      <td style="padding-left:10px;"><input class="iinp qty" type="number" min="1" value="${esc(it.qty||1)}" oninput="updItem('${type}',${i},'qty',this.value)"/></td>
+      <td style="padding:5px 4px;"><input class="iinp" type="text" value="${esc(it.desc||'')}" placeholder="Description" style="width:100%;min-width:110px;" oninput="updItem('${type}',${i},'desc',this.value)"/></td>
+      <td><input class="iinp price" type="number" min="0" step="0.01" value="${esc(it.unitPrice||'')}" placeholder="—" oninput="updItem('${type}',${i},'unitPrice',this.value)"/></td>
+      <td><div class="irow-tot" id="${type}-tot-${i}">${totHtml}</div></td>
+      <td style="white-space:nowrap;"><button class="lkp-btn" onclick="lookupPrice('${type}',${i})" title="Look up price on Home Depot">🔍</button><button class="del-btn" onclick="rmItem('${type}',${i})">×</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function addItem(type, desc) {
+  const e = getEst(db.cur);
+  if (!e) return;
+  e[type].push({ qty: 1, desc: desc || '', unitPrice: '' });
+  dbSave();
+  renderItems(type, e[type]);
+  rc();
+  const rows = document.getElementById(`${type}-tb`).querySelectorAll('tr');
+  const last = rows[rows.length - 1];
+  if (last) {
+    const target = desc ? last.querySelector('.iinp.price') : last.querySelectorAll('input')[1];
+    if (target) target.focus();
+  }
+}
+
+function quickAdd(type, desc) {
+  addItem(type, desc);
+}
+
+function rmItem(type, i) {
+  const e = getEst(db.cur);
+  if (!e) return;
+  e[type].splice(i, 1);
+  dbSave(); renderItems(type, e[type]); rc();
+}
+
+function updItem(type, i, field, val) {
+  const e = getEst(db.cur);
+  if (!e || !e[type][i]) return;
+  if (field === 'qty') e[type][i].qty = parseFloat(val) || 1;
+  else if (field === 'unitPrice') e[type][i].unitPrice = val === '' ? '' : parseFloat(val) || 0;
+  else e[type][i][field] = val;
+  const q = parseFloat(e[type][i].qty) || 0, u = parseFloat(e[type][i].unitPrice) || 0;
+  const totEl = document.getElementById(`${type}-tot-${i}`);
+  if (totEl) totEl.innerHTML = (q && u) ? `<span style="color:var(--text)">${fmt(q*u)}</span>` : `<span style="color:#e2e8f0">—</span>`;
+  dbSave(); rc();
+}
+
+/* ══════════════════════════════════════════
+   PRICE LOOKUP
+══════════════════════════════════════════ */
+function lookupPrice(type, i) {
+  const e = getEst(db.cur);
+  if (!e || !e[type][i]) return;
+  const desc = e[type][i].desc || '';
+  if (!desc) { alert('Enter a description first, then tap 🔍'); return; }
+  const suffix = type === 'lumber' ? ' lumber' : ' hardware';
+  const q = encodeURIComponent(desc + suffix);
+  window.open('https://www.homedepot.com/s/' + q, '_blank');
+}
+
+/* ══════════════════════════════════════════
+   QUICK PICK PANELS
+══════════════════════════════════════════ */
+function toggleQuick(type) {
+  const panel = document.getElementById(`${type}-qp`);
+  const btn = document.getElementById(`${type}-qt`);
+  const open = panel.classList.toggle('open');
+  btn.textContent = open
+    ? `⚡ Quick Pick ${type.charAt(0).toUpperCase()+type.slice(1)} ▴`
+    : `⚡ Quick Pick ${type.charAt(0).toUpperCase()+type.slice(1)} ▾`;
+}
+
+/* ══════════════════════════════════════════
+   VOICE INPUT
+══════════════════════════════════════════ */
+let recognition = null;
+let isListening = false;
+
+function toggleMic() {
+  if (isListening) { stopMic(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    alert('Voice input requires Safari on iOS 14.5+ or Chrome on Android. Make sure you\'re using HTTPS.');
+    return;
+  }
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  const btn = document.getElementById('mic-btn');
+  const notes = document.getElementById('f-notes');
+  const interim = document.getElementById('mic-interim');
+  let finalBuffer = '';
+
+  recognition.onstart = () => {
+    isListening = true;
+    btn.textContent = '⏹';
+    btn.classList.add('listening');
+    interim.textContent = 'Listening...';
+  };
+
+  recognition.onresult = (evt) => {
+    let interimText = '';
+    for (let i = evt.resultIndex; i < evt.results.length; i++) {
+      const t = evt.results[i][0].transcript;
+      if (evt.results[i].isFinal) {
+        finalBuffer += (finalBuffer ? '\n• ' : '• ') + t.trim();
+      } else {
+        interimText += t;
+      }
+    }
+    interim.textContent = interimText || '🎤 Listening...';
+    if (finalBuffer) {
+      const cur = notes.value.trim();
+      notes.value = cur ? cur + '\n' + finalBuffer : finalBuffer;
+      sv();
+      finalBuffer = '';
+    }
+  };
+
+  recognition.onerror = (evt) => {
+    if (evt.error !== 'aborted') interim.textContent = `Error: ${evt.error}`;
+    stopMic();
+  };
+
+  recognition.onend = () => {
+    if (isListening) recognition.start(); // keep going until user stops
+  };
+
+  recognition.start();
+}
+
+function stopMic() {
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+  isListening = false;
+  const btn = document.getElementById('mic-btn');
+  if (btn) { btn.textContent = '🎤'; btn.classList.remove('listening'); }
+  const interim = document.getElementById('mic-interim');
+  if (interim) interim.textContent = '';
+}
+
+/* ══════════════════════════════════════════
+   LIST VIEW
+══════════════════════════════════════════ */
+function calcGrandTotal(e) {
+  const iS = arr => (arr||[]).reduce((s,it)=>s+(parseFloat(it.qty)||0)*(parseFloat(it.unitPrice)||0),0);
+  const p = e.pr || {};
+  const vS = p.auto!==false ? iS(e.lumber)+iS(e.hardware) : (p.orv||0);
+  const uc = p.ucMode==='%' ? vS*((p.ucVal||0)/100) : (p.ucVal||0);
+  const mat = vS+uc+(p.taxInc?0:p.tax||0)+(p.buf||0)+(p.delInc?0:p.del||0);
+  const l = e.lb||{};
+  return mat+(l.cliLab||0)+(l.cliDemo||0);
+}
+
+function renderList() {
+  const el = document.getElementById('est-list');
+  if (!db.ests.length) {
+    el.innerHTML=`<div class="empty-state"><div class="empty-ico">📋</div><div class="empty-msg">No estimates yet</div><div class="empty-sub">Tap above to create one</div></div>`;
+    return;
+  }
+  const colors={draft:'#ca8a04',sent:'#2563eb',approved:'#16a34a',completed:'#7c3aed'};
+  el.innerHTML=db.ests.map(e=>{
+    const gt=calcGrandTotal(e), sc=colors[e.status]||'#94a3b8';
+    const pmDisplay = e.pmOther || e.pm || '';
+    const meta=[pmDisplay?'PM: '+esc(pmDisplay):'',`<span style="color:${sc};font-weight:700">${e.status||'draft'}</span>`].filter(Boolean).join(' · ');
+    return`<div class="est-card" onclick="goEdit('${e.id}')">
+      <div class="ec-icon">🏗️</div>
+      <div class="ec-info">
+        <div class="ec-name">${esc(e.client||'Untitled Estimate')}</div>
+        <div class="ec-meta">${meta}</div>
+      </div>
+      <div class="ec-total">${gt>0?fmt(gt):'—'}</div>
+      <div class="ec-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   SHARE
+══════════════════════════════════════════ */
+function showShare() {
+  const e = getEst(db.cur); if (!e) return;
+  const iS=arr=>(arr||[]).reduce((s,it)=>s+(parseFloat(it.qty)||0)*(parseFloat(it.unitPrice)||0),0);
+  const p=e.pr||{},l=e.lb||{};
+  const vS=p.auto!==false?iS(e.lumber)+iS(e.hardware):(p.orv||0);
+  const uc=p.ucMode==='%'?vS*((p.ucVal||0)/100):(p.ucVal||0);
+  const tax=p.taxInc?0:(p.tax||0), del=p.delInc?0:(p.del||0), buf=p.buf||0;
+  const clientMat=vS+uc+tax+buf+del;
+  const cliLab=(l.cliLab||0)+(l.cliDemo||0), gt=clientMat+cliLab;
+  const subExp=(l.subCost||0)+(l.subDemo||0), expenses=vS+subExp+(e.myExp||0);
+  const profit=gt-expenses, margin=gt>0?profit/gt*100:0;
+  const pmLabel=e.pmOther||e.pm||'';
+
+  const lines=[];
+  lines.push(e.client||'Estimate');
+  if(pmLabel) lines.push(`PM: ${pmLabel}`);
+  if(e.notes) lines.push(`\nNotes:\n${e.notes}`);
+  if((e.lumber||[]).length){
+    lines.push('\nLumber');
+    e.lumber.forEach(it=>{
+      const q=parseFloat(it.qty)||0,u=parseFloat(it.unitPrice)||0;
+      lines.push(`\t(${q}) ${it.desc||''}${q&&u?'  — '+fmt(q*u):''}`);
+    });
+  }
+  if((e.hardware||[]).length){
+    lines.push('\nHardware');
+    e.hardware.forEach(it=>{
+      const q=parseFloat(it.qty)||0,u=parseFloat(it.unitPrice)||0;
+      lines.push(`\t(${q}) ${it.desc||''}${q&&u?'  — '+fmt(q*u):''}`);
+    });
+  }
+  lines.push('\nMaterials');
+  lines.push(`\tVendor subtotal: ${fmt(vS)}`);
+  if(p.taxInc) lines.push('\tTaxes: included');
+  else lines.push(`\tTaxes: ${fmt(tax)} (Utah 7.25%)`);
+  if(uc) lines.push(`\tUpcharge: ${fmt(uc)}${p.ucMode==='%'?` (${p.ucVal}%)`:''}` );
+  if(buf) lines.push(`\tBuffer: ${fmt(buf)}`);
+  if(p.delInc) lines.push('\tDelivery: included');
+  else lines.push(`\tDelivery: ${fmt(del)}`);
+  lines.push(`\tTotal: ${fmt(clientMat)}`);
+  lines.push('\nLabor');
+  if(l.name||l.days) lines.push(`\t${l.name||'Sub'}${l.days?', '+l.days+' days':''}, ${fmt(subExp)}`);
+  lines.push(`\tWe charge: ${fmt(cliLab)}${l.cliDemo?` ($${(l.cliDemo).toLocaleString()} for demo)`:''}`);
+  lines.push(`\nGrand total: ${fmt(gt)}`);
+  lines.push('\nExpenses');
+  lines.push(`\tLabor: ${fmt(subExp)}`);
+  if(e.myExp) lines.push(`\tMe: ~${fmt(e.myExp)}`);
+  lines.push(`\tMaterials: ${fmt(vS)}`);
+  lines.push(`\tTotal: ${fmt(expenses)}`);
+  lines.push(`\tWe stand to make: ${fmt(profit)} (profit margin: ~${margin.toFixed(0)}%)`);
+
+  document.getElementById('share-txt').value=lines.join('\n');
+  document.getElementById('share-modal').classList.add('on');
+}
+
+function closeShare(){ document.getElementById('share-modal').classList.remove('on'); }
+
+function copyShare(){
+  const txt=document.getElementById('share-txt');
+  const btn=document.getElementById('copy-btn');
+  txt.select(); txt.setSelectionRange(0,99999);
+  try{ document.execCommand('copy'); } catch(e){ if(navigator.clipboard) navigator.clipboard.writeText(txt.value).catch(function(){}); }
+  btn.textContent='✓ Copied!';
+  setTimeout(()=>{ btn.textContent='📋 Copy'; },2000);
+}
+
+document.getElementById('share-modal').addEventListener('click',function(e){ if(e.target===this) closeShare(); });
+
+/* ══════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════ */
+dbLoad();
+goList();
+</script>
+</body>
+</html>
