@@ -19,6 +19,8 @@ html,body{height:100%;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Se
 
 /* ── Header ── */
 #hdr{background:linear-gradient(135deg,#7c2d12 0%,var(--brand) 55%,var(--brand-lt) 100%);padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top,0px));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3);}
+#hdr-l{display:flex;align-items:center;gap:9px;flex:1;min-width:0;}
+#hdr-logo{width:30px;height:30px;border-radius:7px;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.35);}
 #hdr-title{color:#fff;font-size:18px;font-weight:800;letter-spacing:-.2px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #hdr-r{display:flex;gap:6px;flex-shrink:0;}
 .hbtn{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);color:#fff;padding:6px 11px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;display:none;white-space:nowrap;}
@@ -173,7 +175,10 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 
 <!-- ── Header ── -->
 <div id="hdr">
-  <div id="hdr-title">🏗️ Estimates</div>
+  <div id="hdr-l">
+    <img id="hdr-logo" src="icon-192.png" alt="QuickQuote"/>
+    <div id="hdr-title">QuickQuote</div>
+  </div>
   <div id="hdr-r">
     <button class="hbtn" id="share-btn" onclick="showShare()">Share</button>
     <button class="hbtn" id="print-btn" onclick="window.print()">Print</button>
@@ -198,7 +203,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 
   <!-- Project Info -->
   <div class="card">
-    <div class="card-hdr"><span class="card-ttl">📋 Project Info</span></div>
+    <div class="card-hdr"><span class="card-ttl">Project Info</span></div>
     <div class="card-bd">
       <div class="fgrid">
         <div class="frow">
@@ -225,16 +230,16 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
       <div class="frow" style="margin-top:11px;">
         <label class="flbl">Status</label>
         <select class="finp" id="f-status" onchange="sv()">
-          <option value="draft">🟡 Draft</option>
-          <option value="sent">🔵 Sent</option>
-          <option value="approved">🟢 Approved</option>
-          <option value="completed">✅ Completed</option>
+          <option value="draft">Draft</option>
+          <option value="sent">Sent</option>
+          <option value="approved">Approved</option>
+          <option value="completed">Completed</option>
         </select>
       </div>
       <div class="frow" style="margin-top:11px;">
         <label class="flbl">Job Notes</label>
         <div class="notes-wrap">
-          <textarea class="finp" id="f-notes" placeholder="Tap 🎤 to dictate or type notes here..." style="padding-bottom:48px;" oninput="sv()"></textarea>
+          <textarea class="finp" id="f-notes" placeholder="Tap the mic to dictate or type notes here..." style="padding-bottom:48px;" oninput="sv()"></textarea>
           <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Tap to dictate">🎤</button>
         </div>
         <div id="mic-interim"></div>
@@ -245,7 +250,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
   <!-- Lumber -->
   <div class="card">
     <div class="card-hdr">
-      <span class="card-ttl">🪵 Lumber</span>
+      <span class="card-ttl">Lumber</span>
       <span id="lumber-sub-lbl" style="font-size:13px;font-weight:800;color:var(--brand)"></span>
     </div>
     <div style="overflow-x:auto;">
@@ -262,7 +267,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
     </div>
     <div class="tbl-actions">
       <button class="add-item-btn" onclick="addItem('lumber')">＋ Add item</button>
-      <button class="quick-toggle" id="lumber-qt" onclick="toggleQuick('lumber')">⚡ Quick Pick Lumber ▾</button>
+      <button class="quick-toggle" id="lumber-qt" onclick="toggleQuick('lumber')">Quick Pick Lumber ▾</button>
     </div>
     <div class="quick-panel" id="lumber-qp">
       <div class="qg-lbl">2×4</div>
@@ -342,7 +347,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
   <!-- Hardware -->
   <div class="card">
     <div class="card-hdr">
-      <span class="card-ttl">🔩 Hardware</span>
+      <span class="card-ttl">Hardware</span>
       <span id="hardware-sub-lbl" style="font-size:13px;font-weight:800;color:var(--brand)"></span>
     </div>
     <div style="overflow-x:auto;">
@@ -359,7 +364,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
     </div>
     <div class="tbl-actions">
       <button class="add-item-btn" onclick="addItem('hardware')">＋ Add item</button>
-      <button class="quick-toggle" id="hardware-qt" onclick="toggleQuick('hardware')">⚡ Quick Pick Hardware ▾</button>
+      <button class="quick-toggle" id="hardware-qt" onclick="toggleQuick('hardware')">Quick Pick Hardware ▾</button>
     </div>
     <div class="quick-panel" id="hardware-qp">
       <div class="qg-lbl">Hurricane &amp; Rafter Ties</div>
@@ -431,7 +436,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 
   <!-- Materials Pricing -->
   <div class="card">
-    <div class="card-hdr"><span class="card-ttl">💰 Materials Pricing</span></div>
+    <div class="card-hdr"><span class="card-ttl">Materials Pricing</span></div>
     <div class="card-bd">
 
       <div class="prow">
@@ -482,7 +487,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 
   <!-- Labor -->
   <div class="card">
-    <div class="card-hdr"><span class="card-ttl">👷 Labor</span></div>
+    <div class="card-hdr"><span class="card-ttl">Labor</span></div>
     <div class="card-bd">
       <div class="fgrid" style="margin-bottom:13px;">
         <div class="frow">
@@ -518,7 +523,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 
   <!-- Other Expenses -->
   <div class="card">
-    <div class="card-hdr"><span class="card-ttl">🧾 Other Expenses</span></div>
+    <div class="card-hdr"><span class="card-ttl">Other Expenses</span></div>
     <div class="card-bd">
       <div class="prow" style="border-bottom:none;">
         <div class="plbl">My Expenses</div>
@@ -541,7 +546,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 
   <!-- Summary -->
   <div class="card">
-    <div class="card-hdr"><span class="card-ttl">📊 Summary</span></div>
+    <div class="card-hdr"><span class="card-ttl">Summary</span></div>
     <div class="card-bd">
       <div class="sline"><div class="slbl">Client Materials</div><div class="sval" id="s-mat"></div></div>
       <div class="sline"><div class="slbl">Client Labor + Demo</div><div class="sval" id="s-lab"></div></div>
@@ -570,8 +575,8 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 
 <!-- ── Bottom Bar ── -->
 <div id="bot-bar">
-  <button class="abtn secondary" onclick="delEst()">🗑 Delete</button>
-  <button class="abtn primary" onclick="goList()">✓ Save &amp; Back</button>
+  <button class="abtn secondary" onclick="delEst()">Delete</button>
+  <button class="abtn primary" onclick="goList()">Save &amp; Back</button>
 </div>
 
 <!-- ── Share Modal ── -->
@@ -583,7 +588,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
     </div>
     <textarea id="share-txt" readonly></textarea>
     <div class="sm-foot">
-      <button class="abtn secondary" id="copy-btn" onclick="copyShare()" style="flex:1;">📋 Copy</button>
+      <button class="abtn secondary" id="copy-btn" onclick="copyShare()" style="flex:1;">Copy</button>
       <button class="abtn primary" onclick="closeShare()" style="flex:1;">Done</button>
     </div>
   </div>
@@ -628,7 +633,7 @@ function goList() {
   document.getElementById('list-view').classList.add('on');
   document.getElementById('edit-view').classList.remove('on');
   document.getElementById('bot-bar').style.display = 'none';
-  document.getElementById('hdr-title').textContent = '🏗️ Estimates';
+  document.getElementById('hdr-title').textContent = 'QuickQuote';
   ['back-btn','print-btn','share-btn'].forEach(id => { document.getElementById(id).style.display = 'none'; });
   renderList();
 }
@@ -951,8 +956,8 @@ function toggleQuick(type) {
   const btn = document.getElementById(`${type}-qt`);
   const open = panel.classList.toggle('open');
   btn.textContent = open
-    ? `⚡ Quick Pick ${type.charAt(0).toUpperCase()+type.slice(1)} ▴`
-    : `⚡ Quick Pick ${type.charAt(0).toUpperCase()+type.slice(1)} ▾`;
+    ? `Quick Pick ${type.charAt(0).toUpperCase()+type.slice(1)} ▴`
+    : `Quick Pick ${type.charAt(0).toUpperCase()+type.slice(1)} ▾`;
 }
 
 /* ══════════════════════════════════════════
@@ -1041,7 +1046,7 @@ function calcGrandTotal(e) {
 function renderList() {
   const el = document.getElementById('est-list');
   if (!db.ests.length) {
-    el.innerHTML=`<div class="empty-state"><div class="empty-ico">📋</div><div class="empty-msg">No estimates yet</div><div class="empty-sub">Tap above to create one</div></div>`;
+    el.innerHTML=`<div class="empty-state"><div class="empty-msg">No estimates yet</div><div class="empty-sub">Tap above to create one</div></div>`;
     return;
   }
   const colors={draft:'#ca8a04',sent:'#2563eb',approved:'#16a34a',completed:'#7c3aed'};
@@ -1050,7 +1055,6 @@ function renderList() {
     const pmDisplay = e.pmOther || e.pm || '';
     const meta=[pmDisplay?'PM: '+esc(pmDisplay):'',`<span style="color:${sc};font-weight:700">${e.status||'draft'}</span>`].filter(Boolean).join(' · ');
     return`<div class="est-card" onclick="goEdit('${e.id}')">
-      <div class="ec-icon">🏗️</div>
       <div class="ec-info">
         <div class="ec-name">${esc(e.client||'Untitled Estimate')}</div>
         <div class="ec-meta">${meta}</div>
@@ -1126,8 +1130,8 @@ function copyShare(){
   const btn=document.getElementById('copy-btn');
   txt.select(); txt.setSelectionRange(0,99999);
   try{ document.execCommand('copy'); } catch(e){ if(navigator.clipboard) navigator.clipboard.writeText(txt.value).catch(function(){}); }
-  btn.textContent='✓ Copied!';
-  setTimeout(()=>{ btn.textContent='📋 Copy'; },2000);
+  btn.textContent='Copied!';
+  setTimeout(()=>{ btn.textContent='Copy'; },2000);
 }
 
 document.getElementById('share-modal').addEventListener('click',function(e){ if(e.target===this) closeShare(); });
