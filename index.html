@@ -162,6 +162,12 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 
 /* Manage (Clients & Subs) modal */
 .hbtn.always{display:block;}
+.menu-btn{padding:6px 9px;display:flex;align-items:center;}
+#topmenu{position:absolute;top:calc(100% + 4px);right:10px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:190px;overflow:hidden;display:none;z-index:150;}
+#topmenu.on{display:block;}
+.tm-item{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;text-align:left;padding:14px 16px;font-size:15px;font-weight:600;color:var(--text);cursor:pointer;}
+.tm-item:active{background:#f1f5f9;}
+.tm-item:not(:last-child){border-bottom:1px solid var(--border);}
 #manage-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);padding:16px;align-items:flex-end;justify-content:center;}
 #manage-modal.on{display:flex;}
 #manage-box{background:#fff;border-radius:16px;width:100%;max-width:540px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.3);}
@@ -232,10 +238,12 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
     <div id="hdr-title">QuickQuote</div>
   </div>
   <div id="hdr-r">
-    <button class="hbtn always" id="lists-btn" onclick="openManage()">Lists</button>
     <button class="hbtn" id="share-btn" onclick="showShare()">Share</button>
-    <button class="hbtn" id="print-btn" onclick="printDoc()">Print</button>
     <button class="hbtn" id="back-btn" onclick="goList()">← Back</button>
+    <button class="hbtn always menu-btn" id="menu-btn" onclick="toggleMenu(event)" aria-label="Menu"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  </div>
+  <div id="topmenu">
+    <button class="tm-item" onclick="closeMenu();openManage()">Subs &amp; Prices</button>
   </div>
 </div>
 
@@ -768,7 +776,7 @@ function goList() {
   document.getElementById('edit-view').classList.remove('on');
   document.getElementById('bot-bar').style.display = 'none';
   document.getElementById('hdr-title').textContent = 'QuickQuote';
-  ['back-btn','print-btn','share-btn'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+  ['back-btn','share-btn'].forEach(id => { document.getElementById(id).style.display = 'none'; });
   renderList();
 }
 
@@ -777,7 +785,7 @@ function goEdit(id) {
   document.getElementById('list-view').classList.remove('on');
   document.getElementById('edit-view').classList.add('on');
   document.getElementById('bot-bar').style.display = 'flex';
-  ['back-btn','print-btn','share-btn'].forEach(id2 => { document.getElementById(id2).style.display = 'block'; });
+  ['back-btn','share-btn'].forEach(id2 => { document.getElementById(id2).style.display = 'block'; });
   loadForm(id);
   window.scrollTo(0, 0);
 }
@@ -1014,6 +1022,17 @@ function onSubChange() {
   }
   recalcLabor();
 }
+
+/* ── Top-bar overflow menu ── */
+function toggleMenu(ev) {
+  if (ev) ev.stopPropagation();
+  document.getElementById('topmenu').classList.toggle('on');
+}
+function closeMenu() { document.getElementById('topmenu').classList.remove('on'); }
+document.addEventListener('click', function(ev) {
+  const m = document.getElementById('topmenu'), b = document.getElementById('menu-btn');
+  if (m.classList.contains('on') && !m.contains(ev.target) && !b.contains(ev.target)) closeMenu();
+});
 
 /* ── Manage modal (clients / subs / saved prices) ── */
 function openManage() { renderManage(); document.getElementById('manage-modal').classList.add('on'); }
