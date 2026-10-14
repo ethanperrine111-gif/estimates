@@ -216,8 +216,12 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 .doc-total .cap{font-size:10px;opacity:.85;font-weight:700;letter-spacing:.5px;}
 .doc-muted{color:var(--muted);}
 
+/* ── Update banner ── */
+#upd{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:300;background:#0f172a;color:#fff;border:none;border-radius:20px;padding:9px 16px;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;white-space:nowrap;}
+#upd.on{display:block;}
+
 @media print{
-  #hdr,#list-view,#edit-view,#bot-bar,#share-modal,#manage-modal{display:none!important;}
+  #hdr,#list-view,#edit-view,#bot-bar,#share-modal,#manage-modal,#upd{display:none!important;}
   #doc{display:block!important;}
   .doc-wrap{max-width:none;border-radius:0;padding:0;}
   body{background:#fff!important;}
@@ -230,6 +234,8 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 </style>
 </head>
 <body>
+
+<button id="upd" onclick="applyUpdate()">Update available — tap to reload</button>
 
 <!-- ── Header ── -->
 <div id="hdr">
@@ -1589,6 +1595,26 @@ document.getElementById('manage-modal').addEventListener('click',function(e){ if
 ══════════════════════════════════════════ */
 dbLoad();
 goList();
+
+/* ══════════════════════════════════════════
+   OFFLINE (service worker)
+══════════════════════════════════════════ */
+let swWaiting = null, swReload = false;
+function showUpdate(w){ swWaiting=w; document.getElementById('upd').classList.add('on'); }
+function applyUpdate(){ swReload=true; if(swWaiting) swWaiting.postMessage('skipWaiting'); else location.reload(); }
+if('serviceWorker' in navigator){
+  // Only reload when the user asked for the update (not on the very first install).
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(swReload){ swReload=false; location.reload(); } });
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    if(reg.waiting && navigator.serviceWorker.controller) showUpdate(reg.waiting);
+    reg.addEventListener('updatefound',()=>{
+      const w=reg.installing;
+      w.addEventListener('statechange',()=>{ if(w.state==='installed' && navigator.serviceWorker.controller) showUpdate(w); });
+    });
+    // Home-screen apps can stay open for days; check for a new version when brought back.
+    document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') reg.update().catch(()=>{}); });
+  }).catch(()=>{});
+}
 </script>
 </body>
 </html>
