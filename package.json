@@ -1,0 +1,12 @@
+{
+  "name": "quickquote",
+  "private": true,
+  "description": "QuickQuote estimate builder (single-file PWA) — test harness",
+  "scripts": {
+    "test": "playwright test",
+    "serve": "node tests/server.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}
