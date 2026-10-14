@@ -168,6 +168,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 .tm-item{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;text-align:left;padding:14px 16px;font-size:15px;font-weight:600;color:var(--text);cursor:pointer;}
 .tm-item:active{background:#f1f5f9;}
 .tm-item:not(:last-child){border-bottom:1px solid var(--border);}
+.tm-sub{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-top:2px;}
 #manage-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);padding:16px;align-items:flex-end;justify-content:center;}
 #manage-modal.on{display:flex;}
 #manage-box{background:#fff;border-radius:16px;width:100%;max-width:540px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.3);}
@@ -244,7 +245,10 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
   </div>
   <div id="topmenu">
     <button class="tm-item" onclick="closeMenu();openManage()">Subs &amp; Prices</button>
+    <button class="tm-item" onclick="closeMenu();exportBackup()"><span>Export backup<span class="tm-sub" id="backup-hint"></span></span></button>
+    <button class="tm-item" onclick="closeMenu();document.getElementById('import-file').click()">Import backup</button>
   </div>
+  <input type="file" id="import-file" accept=".json,application/json" style="display:none" onchange="importBackup(this)"/>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -1026,6 +1030,7 @@ function onSubChange() {
 /* ── Top-bar overflow menu ── */
 function toggleMenu(ev) {
   if (ev) ev.stopPropagation();
+  renderBackupHint();
   document.getElementById('topmenu').classList.toggle('on');
 }
 function closeMenu() { document.getElementById('topmenu').classList.remove('on'); }
@@ -1033,6 +1038,86 @@ document.addEventListener('click', function(ev) {
   const m = document.getElementById('topmenu'), b = document.getElementById('menu-btn');
   if (m.classList.contains('on') && !m.contains(ev.target) && !b.contains(ev.target)) closeMenu();
 });
+
+/* ── Backup: export / import the whole db as JSON ── */
+const BACKUP_KEY = STORE_KEY + '-lastbackup';
+const dateStamp = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const plural = (n, w, ws) => n + ' ' + (n === 1 ? w : (ws || w + 's'));
+function dbCounts(d) {
+  return plural((d.ests || []).length, 'estimate') + ', ' + plural((d.companies || []).length, 'company', 'companies') + ', ' +
+    plural((d.subs || []).length, 'sub') + ', ' + plural(Object.keys(d.prices || {}).length, 'saved price');
+}
+
+function renderBackupHint() {
+  let t = null;
+  try { t = parseInt(localStorage.getItem(BACKUP_KEY), 10) || null; } catch(e) {}
+  let txt = 'Never backed up';
+  if (t) {
+    const days = Math.round((new Date().setHours(0,0,0,0) - new Date(t).setHours(0,0,0,0)) / 864e5);
+    txt = 'Last backed up ' + (days <= 0 ? 'today' : days === 1 ? 'yesterday' : days + ' days ago');
+  }
+  document.getElementById('backup-hint').textContent = txt;
+}
+function markBackedUp() { try { localStorage.setItem(BACKUP_KEY, String(Date.now())); } catch(e) {} }
+
+function exportBackup() {
+  const name = 'quickquote-backup-' + dateStamp(new Date()) + '.json';
+  const json = JSON.stringify(db, null, 2);
+  const download = () => {
+    const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    markBackedUp();
+  };
+  let file = null;
+  try { file = new File([json], name, { type: 'application/json' }); } catch(e) {}
+  if (file && navigator.canShare && navigator.share && navigator.canShare({ files: [file] })) {
+    navigator.share({ files: [file], title: name }).then(markBackedUp).catch(err => { if (!err || err.name !== 'AbortError') download(); });
+  } else download();
+}
+
+function validBackup(d) {
+  const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
+  if (!isObj(d) || !Array.isArray(d.ests)) return false;
+  if (!d.ests.every(e => isObj(e) && typeof e.id === 'string')) return false;
+  if (d.companies != null && !Array.isArray(d.companies)) return false;
+  if (d.subs != null && !Array.isArray(d.subs)) return false;
+  if (d.prices != null && !isObj(d.prices)) return false;
+  if (d.settings != null && !isObj(d.settings)) return false;
+  return true;
+}
+
+function importBackup(inp) {
+  const f = inp.files && inp.files[0];
+  inp.value = '';
+  if (!f) return;
+  const bad = () => alert('That file isn\'t a QuickQuote backup. Nothing was changed.');
+  const rd = new FileReader();
+  rd.onerror = () => alert('Couldn\'t read that file. Nothing was changed.');
+  rd.onload = () => {
+    let d;
+    try { d = JSON.parse(rd.result); } catch(e) { bad(); return; }
+    if (!validBackup(d)) { bad(); return; }
+    if (!confirm('Restore backup "' + f.name + '"?\n\nBackup has: ' + dbCounts(d) +
+      '.\n\nThis replaces all current data — ' + dbCounts(db) + '. This can\'t be undone.')) return;
+    const prev = localStorage.getItem(STORE_KEY);
+    d.cur = null;
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); }
+    catch(e) {
+      try { if (prev != null) localStorage.setItem(STORE_KEY, prev); } catch(e2) {}
+      alert('Couldn\'t save the backup on this device. Nothing was changed.');
+      return;
+    }
+    dbLoad(); dbSave();
+    document.getElementById('manage-modal').classList.remove('on');
+    document.getElementById('share-modal').classList.remove('on');
+    goList();
+    alert('Backup restored — ' + dbCounts(db) + '.');
+  };
+  rd.readAsText(f);
+}
 
 /* ── Manage modal (clients / subs / saved prices) ── */
 function openManage() { renderManage(); document.getElementById('manage-modal').classList.add('on'); }
