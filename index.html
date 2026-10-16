@@ -30,7 +30,7 @@ html,body{height:100%;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Se
 .view{display:none;} .view.on{display:block;}
 
 /* ── List view ── */
-#list-view{padding:14px;padding-bottom:calc(env(safe-area-inset-bottom,0px)+14px);max-width:620px;margin:0 auto;}
+#list-view{padding:14px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px);max-width:620px;margin:0 auto;}
 .new-est-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--brand);color:#fff;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(234,88,12,.35);margin-bottom:16px;}
 .new-est-btn:active{background:var(--brand-dk);}
 .order-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(22,163,74,.3);margin-bottom:14px;}
@@ -40,7 +40,7 @@ html,body{height:100%;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Se
 .ec-icon{font-size:26px;flex-shrink:0;}
 .ec-info{flex:1;min-width:0;}
 .ec-name{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ec-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.ec-meta{font-size:12px;color:var(--muted);margin-top:2px;overflow-wrap:anywhere;}
 .ec-total{font-size:17px;font-weight:800;color:var(--brand);white-space:nowrap;flex-shrink:0;}
 .ec-arrow{color:#cbd5e1;font-size:18px;flex-shrink:0;}
 .empty-state{text-align:center;padding:52px 20px;color:var(--muted);}
@@ -85,9 +85,12 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 .iinp.qty{width:50px;text-align:center;}
 .iinp.price{width:80px;text-align:right;}
 .irow-tot{font-size:13px;font-weight:700;text-align:right;padding:0 6px;min-width:68px;white-space:nowrap;}
-.del-btn{background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:20px;line-height:1;padding:0 4px;}
+.del-btn{background:none;border:none;cursor:pointer;color:#94a3b8;font-size:22px;line-height:1;padding:0 4px;min-width:36px;min-height:36px;}
 .del-btn:active{color:var(--red);}
-.lkp-btn{background:none;border:none;cursor:pointer;color:#94a3b8;font-size:14px;line-height:1;padding:0 3px;}
+.lkp-btn{background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px;line-height:1;padding:0 3px;min-width:36px;min-height:36px;}
+.irow-none{color:#94a3b8;}
+.c-qty{padding-left:10px!important;} .c-desc{padding:5px 4px!important;} .c-desc .iinp{min-width:110px;}
+.c-act{white-space:nowrap;padding-right:10px!important;text-align:right;}
 .lkp-btn:active{color:var(--brand);}
 
 /* Add & Quick Pick */
@@ -119,7 +122,8 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 .mode-tog{display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;flex-shrink:0;}
 .mbtn{flex:1;background:none;border:none;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);}
 .mbtn.on{background:var(--brand);color:#fff;}
-.auto-badge{font-size:10px;font-weight:700;background:#fef3c7;color:var(--yellow);border-radius:4px;padding:1px 5px;margin-left:4px;}
+.auto-badge{font-size:10px;font-weight:700;background:#fef3c7;color:#854d0e;border-radius:4px;padding:1px 5px;margin-left:4px;}
+.auto-badge.manual{background:#e0e7ff;color:#3730a3;}
 
 /* Summary */
 .sline{display:flex;align-items:baseline;gap:8px;padding:7px 0;}
@@ -168,6 +172,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 .tm-item{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;text-align:left;padding:14px 16px;font-size:15px;font-weight:600;color:var(--text);cursor:pointer;}
 .tm-item:active{background:#f1f5f9;}
 .tm-item:not(:last-child){border-bottom:1px solid var(--border);}
+.tm-sub{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-top:2px;}
 #manage-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);padding:16px;align-items:flex-end;justify-content:center;}
 #manage-modal.on{display:flex;}
 #manage-box{background:#fff;border-radius:16px;width:100%;max-width:540px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.3);}
@@ -194,7 +199,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 #share-preview{flex:1;overflow:auto;background:#eef2f6;padding:12px;}
 #doc{display:none;}
 .doc-wrap{max-width:780px;margin:0 auto;padding:26px 28px;background:#fff;color:#0f172a;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;border-radius:8px;}
-.doc-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--brand);padding-bottom:13px;margin-bottom:16px;}
+.doc-head{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--brand);padding-bottom:13px;margin-bottom:16px;}
 .doc-brand{display:flex;align-items:center;gap:10px;}
 .doc-brand img{width:40px;height:40px;border-radius:9px;}
 .doc-brand .nm{font-size:21px;font-weight:800;letter-spacing:-.3px;}
@@ -203,6 +208,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 .doc-title .d{font-size:12px;color:var(--muted);margin-top:3px;}
 .doc-job{font-size:23px;font-weight:800;margin-bottom:12px;letter-spacing:-.4px;}
 .doc-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px 20px;margin-bottom:6px;font-size:13px;}
+.doc-meta>div{overflow-wrap:anywhere;} .doc-meta .addr{white-space:pre-line;}
 .doc-meta .lbl{color:var(--muted);font-weight:800;text-transform:uppercase;font-size:9.5px;letter-spacing:.5px;margin-bottom:1px;}
 .doc-sec{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--brand-dk);border-bottom:1.5px solid var(--border);padding-bottom:4px;margin:18px 0 7px;}
 .doc-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:4px;}
@@ -216,12 +222,50 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 .doc-total .cap{font-size:10px;opacity:.85;font-weight:700;letter-spacing:.5px;}
 .doc-muted{color:var(--muted);}
 
+/* Share tabs */
+.share-tabs{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;}
+.share-tabs .mbtn{padding:8px 16px;font-size:13px;}
+
+/* Data safety: save failure + backup reminder */
+#save-warn{display:none;position:sticky;top:0;z-index:250;background:var(--red);color:#fff;padding:10px 14px;font-size:13px;font-weight:700;text-align:center;}
+#save-warn.on{display:block;}
+#save-warn button{margin-left:8px;background:#fff;color:var(--red);border:none;border-radius:6px;padding:4px 10px;font-weight:800;cursor:pointer;}
+#backup-nag{display:none;background:#fff7ed;border:1.5px solid #fdba74;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:#7c2d12;align-items:center;gap:10px;}
+#backup-nag.on{display:flex;}
+#backup-nag .t{flex:1;}
+#backup-nag button{background:var(--brand-dk);color:#fff;border:none;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+/* Toast (e.g. "Removed item · Undo") */
+#toast{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:310;background:#0f172a;color:#fff;border-radius:22px;padding:6px 6px 6px 16px;font-size:13px;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.3);align-items:center;gap:10px;max-width:calc(100% - 32px);}
+#toast.on{display:flex;}
+#toast .msg{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#toast button{background:none;border:none;color:#fdba74;font-weight:800;font-size:13px;padding:8px 12px;cursor:pointer;}
+
+/* ── Update banner ── */
+#upd{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:300;background:#0f172a;color:#fff;border:none;border-radius:20px;padding:9px 16px;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;white-space:nowrap;}
+#upd.on{display:block;}
+
 @media print{
-  #hdr,#list-view,#edit-view,#bot-bar,#share-modal,#manage-modal{display:none!important;}
+  #hdr,#list-view,#edit-view,#bot-bar,#share-modal,#manage-modal,#upd,#toast,#save-warn{display:none!important;}
   #doc{display:block!important;}
   .doc-wrap{max-width:none;border-radius:0;padding:0;}
   body{background:#fff!important;}
   .doc-head,.doc-total{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+@media(max-width:560px){
+  /* Line items as two-line rows so total, lookup and delete fit on a phone:
+     [ description ............ 🔍 × ]
+     [ qty | unit $ | line total     ] */
+  .itbl thead{display:none;}
+  .itbl tr{display:grid;grid-template-columns:64px 1fr 1fr 80px;grid-template-areas:"desc desc desc act" "qty price tot tot";gap:6px 6px;padding:8px 10px;border-bottom:1px solid #f1f5f9;}
+  .itbl td{display:block;padding:0!important;border:none!important;}
+  .itbl .c-qty{grid-area:qty;} .itbl .c-desc{grid-area:desc;} .itbl .c-price{grid-area:price;}
+  .itbl .c-tot{grid-area:tot;align-self:center;} .itbl .c-act{grid-area:act;display:flex;justify-content:flex-end;}
+  .itbl .c-desc .iinp{min-width:0;}
+  .iinp{font-size:16px;padding:8px;}
+  .iinp.qty,.iinp.price{width:100%;}
+  .lkp-btn,.del-btn{min-width:40px;min-height:40px;}
+  .doc-wrap{padding:18px 16px;}
 }
 @media(max-width:480px){
   .fgrid{grid-template-columns:1fr;}
@@ -230,6 +274,10 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 </style>
 </head>
 <body>
+
+<button id="upd" onclick="applyUpdate()">Update available — tap to reload</button>
+<div id="save-warn">Couldn't save on this phone — storage is full or blocked.<button onclick="exportBackup()">Back up now</button></div>
+<div id="toast"><span class="msg" id="toast-msg"></span><button id="toast-act"></button></div>
 
 <!-- ── Header ── -->
 <div id="hdr">
@@ -244,7 +292,10 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
   </div>
   <div id="topmenu">
     <button class="tm-item" onclick="closeMenu();openManage()">Subs &amp; Prices</button>
+    <button class="tm-item" onclick="closeMenu();exportBackup()"><span>Export backup<span class="tm-sub" id="backup-hint"></span></span></button>
+    <button class="tm-item" onclick="closeMenu();document.getElementById('import-file').click()">Import backup</button>
   </div>
+  <input type="file" id="import-file" accept=".json,application/json" style="display:none" onchange="importBackup(this)"/>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -252,6 +303,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 ═══════════════════════════════════════ -->
 <div id="list-view" class="view on">
   <div id="list-wrap">
+    <div id="backup-nag"><div class="t" id="backup-nag-txt"></div><button onclick="exportBackup()">Back up now</button></div>
     <button class="new-est-btn" onclick="newEst()">＋ New Estimate</button>
     <div id="est-list"></div>
   </div>
@@ -524,18 +576,18 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
 
       <div class="prow">
         <div class="plbl">Vendor Subtotal</div>
-        <label class="chk-lbl"><input type="checkbox" id="auto-vendor" checked onchange="sv();rc()"/> Auto</label>
+        <label class="chk-lbl"><input type="checkbox" id="auto-vendor" checked onchange="onAutoVendorChange()"/> Auto</label>
         <div class="pval" id="vendor-disp">$0</div>
       </div>
       <div class="prow" id="vendor-or-row" style="display:none;">
         <div class="plbl sm">Override amount</div>
-        <input class="pinp" id="vendor-or" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+        <input class="pinp" id="vendor-or" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
       </div>
 
       <div class="prow">
         <div class="plbl">Taxes <span class="auto-badge" id="tax-auto-badge" style="display:none;">Utah 7.25%</span></div>
         <label class="chk-lbl"><input type="checkbox" id="tax-inc" checked onchange="onTaxChange()"/> Included</label>
-        <input class="pinp" id="tax-amt" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()" style="display:none;"/>
+        <input class="pinp" id="tax-amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" oninput="onTaxAmtInput()" style="display:none;"/>
       </div>
 
       <div class="prow">
@@ -545,20 +597,20 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
             <button class="mbtn" id="uc-dollar" onclick="setUCMode('$')">$</button>
             <button class="mbtn on" id="uc-pct" onclick="setUCMode('%')">%</button>
           </div>
-          <input class="pinp" id="uc-val" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()" style="width:88px;"/>
+          <input class="pinp" id="uc-val" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" oninput="sv();rc()" style="width:88px;"/>
         </div>
       </div>
       <div id="uc-hint" style="font-size:11px;color:var(--muted);text-align:right;padding:2px 0 4px;display:none;"></div>
 
       <div class="prow">
         <div class="plbl">Buffer <span class="auto-badge">$300 default</span></div>
-        <input class="pinp" id="buf-val" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+        <input class="pinp" id="buf-val" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
       </div>
 
       <div class="prow">
         <div class="plbl">Delivery <span class="auto-badge" id="del-auto-badge" style="display:none;">$100</span></div>
         <label class="chk-lbl"><input type="checkbox" id="del-inc" checked onchange="onDelChange()"/> Included</label>
-        <input class="pinp" id="del-amt" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()" style="display:none;"/>
+        <input class="pinp" id="del-amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" oninput="sv();rc()" style="display:none;"/>
       </div>
 
       <div class="prow" style="padding-top:13px;margin-top:6px;border-top:2px solid var(--border);">
@@ -582,27 +634,27 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
         </div>
         <div class="frow">
           <label class="flbl">Days</label>
-          <input class="finp" id="sub-days" type="number" min="0" step="0.5" placeholder="0" oninput="recalcLabor()"/>
+          <input class="finp" id="sub-days" type="number" inputmode="decimal" min="0" step="0.5" placeholder="0" oninput="recalcLabor('days')"/>
         </div>
       </div>
       <div class="frow" style="margin-bottom:13px;">
         <label class="flbl">Daily Rate (sub)</label>
-        <input class="finp" id="sub-daily" type="number" min="0" step="0.01" placeholder="0" oninput="recalcLabor()"/>
+        <input class="finp" id="sub-daily" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" oninput="recalcLabor('daily')"/>
       </div>
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:6px;">Our Costs</div>
       <div class="prow">
-        <div class="plbl">Sub Labor Cost <span class="auto-badge">days × rate</span></div>
-        <input class="pinp" id="sub-cost" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+        <div class="plbl">Sub Labor Cost <span class="auto-badge" id="sub-cost-badge">days × rate</span></div>
+        <input class="pinp" id="sub-cost" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" oninput="onManualAmt('subCost')"/>
       </div>
       <div style="border-top:1.5px dashed var(--border);margin:10px 0;"></div>
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:6px;">We Charge Client</div>
       <div class="prow">
         <div class="plbl bold">Labor charge <span class="auto-badge" id="cli-rate-badge">$3,000/day</span></div>
-        <input class="pinp" id="cli-labor" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+        <input class="pinp" id="cli-labor" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" oninput="onManualAmt('cliLab')"/>
       </div>
       <div class="prow">
         <div class="plbl bold">Demo charge</div>
-        <input class="pinp" id="cli-demo" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+        <input class="pinp" id="cli-demo" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
       </div>
     </div>
   </div>
@@ -613,11 +665,11 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
     <div class="card-bd">
       <div class="prow">
         <div class="plbl">Managing Labor &amp; Expenses <span class="auto-badge" id="mgmt-rate-badge">$35/hr</span></div>
-        <input class="pinp" id="mgmt-labor" type="number" min="0" step="0.01" placeholder="0" oninput="sv();rc()"/>
+        <input class="pinp" id="mgmt-labor" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" oninput="onManualAmt('mgmt')"/>
       </div>
       <div class="prow" style="border-bottom:none;">
         <div class="plbl">Hours <span class="auto-badge">× rate</span></div>
-        <input class="pinp" id="mgmt-hours" type="number" min="0" step="0.5" placeholder="0" oninput="recalcMgmt()"/>
+        <input class="pinp" id="mgmt-hours" type="number" inputmode="decimal" min="0" step="0.5" placeholder="0" oninput="recalcMgmt('hours')"/>
       </div>
     </div>
   </div>
@@ -647,7 +699,8 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
       <div style="height:14px;"></div>
       <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:6px;">Expenses</div>
       <div class="sline"><div class="slbl indent">Vendor Materials</div><div class="sval muted" id="s-e-mat"></div></div>
-      <div class="sline"><div class="slbl indent">Sub Labor + Demo</div><div class="sval muted" id="s-e-lab"></div></div>
+      <div class="sline" id="s-e-taxdel-row" style="display:none;"><div class="slbl indent">Tax &amp; Delivery Paid</div><div class="sval muted" id="s-e-taxdel"></div></div>
+      <div class="sline"><div class="slbl indent">Sub Labor</div><div class="sval muted" id="s-e-lab"></div></div>
       <div class="sline"><div class="slbl indent">Managing Labor &amp; Expenses</div><div class="sval muted" id="s-e-mgmt"></div></div>
       <div class="sline" style="border-top:2px solid var(--border);margin-top:4px;padding-top:10px;">
         <div class="slbl bold">Total Expenses</div><div class="sval" id="s-exp"></div>
@@ -676,6 +729,13 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
       <h2>Share Estimate</h2>
       <button class="sm-close" onclick="closeShare()">×</button>
     </div>
+    <div class="share-tabs">
+      <div class="mode-tog">
+        <button class="mbtn" id="sk-client" onclick="setShareKind('client')">Customer</button>
+        <button class="mbtn" id="sk-internal" onclick="setShareKind('internal')">Internal</button>
+      </div>
+      <label class="chk-lbl" id="share-opts"><input type="checkbox" id="share-notes" onchange="setShareNotes(this.checked)"/> Include job notes</label>
+    </div>
     <div id="share-preview"></div>
     <textarea id="share-txt" readonly style="display:none;"></textarea>
     <div class="sm-foot">
@@ -698,8 +758,8 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
     <div id="manage-body">
       <div class="mg-sec">
         <div class="mg-h">Rates</div>
-        <div class="mg-row"><div class="nm">Client labor — per day</div><span class="rate-lbl">$</span><input class="sub-rate" id="rate-clientday" type="number" min="0" step="1" onchange="updRate('clientDayRate',this.value)"/></div>
-        <div class="mg-row"><div class="nm">Managing labor — per hour</div><span class="rate-lbl">$</span><input class="sub-rate" id="rate-mgmthr" type="number" min="0" step="1" onchange="updRate('mgmtHourRate',this.value)"/></div>
+        <div class="mg-row"><div class="nm">Client labor — per day</div><span class="rate-lbl">$</span><input class="sub-rate" id="rate-clientday" type="number" inputmode="decimal" min="0" step="1" onchange="updRate('clientDayRate',this.value)"/></div>
+        <div class="mg-row"><div class="nm">Managing labor — per hour</div><span class="rate-lbl">$</span><input class="sub-rate" id="rate-mgmthr" type="number" inputmode="decimal" min="0" step="1" onchange="updRate('mgmtHourRate',this.value)"/></div>
       </div>
       <div class="mg-sec">
         <div class="mg-h">Companies</div>
@@ -714,7 +774,7 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5;}
         <div id="sub-list"></div>
         <div class="mg-add-sub">
           <input class="finp" id="new-sub" placeholder="Sub name"/>
-          <input class="finp" id="new-sub-daily" type="number" min="0" step="0.01" placeholder="Daily $"/>
+          <input class="finp" id="new-sub-daily" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Daily $"/>
           <button class="mg-addbtn" onclick="addSub()">Add Sub</button>
         </div>
       </div>
@@ -747,24 +807,73 @@ function dbLoad() {
   db.settings = db.settings || {};
   if (db.settings.clientDayRate == null) db.settings.clientDayRate = 3000;
   if (db.settings.mgmtHourRate == null) db.settings.mgmtHourRate = 35;
+  // Older estimates stored tax as a one-time snapshot: keep those amounts as typed.
+  db.ests.forEach(e => { if (e.pr && e.pr.taxAuto === undefined) e.pr.taxAuto = e.pr.taxInc !== false; });
+  // Older estimates have no "typed by hand" flags: an amount that isn't the auto value was typed.
+  db.ests.forEach(e => {
+    const l = e.lb;
+    if (l && l.subCostManual === undefined) l.subCostManual = !!l.subCost && round2(num(l.days) * num(l.daily)) !== l.subCost;
+    if (l && l.cliLabManual === undefined) l.cliLabManual = !!l.cliLab && round2(num(l.days) * db.settings.clientDayRate) !== l.cliLab;
+    if (e.mgmtManual === undefined) e.mgmtManual = !!e.mgmtLabor && round2(num(e.mgmtHours) * db.settings.mgmtHourRate) !== e.mgmtLabor;
+  });
 }
 const priceKey = d => String(d || '').trim().toLowerCase();
-function dbSave() { try { localStorage.setItem(STORE_KEY, JSON.stringify(db)); } catch(e) {} }
+let saveFailed = false;
+function dbSave() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(db));
+    if (saveFailed) { saveFailed = false; renderSaveWarn(); }
+  } catch(e) {
+    saveFailed = true; renderSaveWarn();
+  }
+}
+function renderSaveWarn() {
+  const el = document.getElementById('save-warn');
+  if (el) el.classList.toggle('on', saveFailed);
+}
 
 /* ══════════════════════════════════════════
    HELPERS
 ══════════════════════════════════════════ */
-const fmt = n => '$' + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
-const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const money = (n, digits) => {
+  const v = Number(n || 0);
+  const s = '$' + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  return v < 0 && s !== '$' + (0).toFixed(digits) ? '-' + s : s;
+};
+const fmt = n => money(n, 0);                    // whole dollars, for totals
+const fmt2 = n => money(n, 2);                   // cents, for unit prices and line totals
+const round2 = n => Math.round((Number(n) || 0) * 100) / 100;
+// Parse a typed number: ignores "$", "," and spaces, never negative, NaN → 0.
+const num = v => { const n = parseFloat(String(v == null ? '' : v).replace(/[$,\s]/g, '')); return isNaN(n) ? 0 : Math.max(0, n); };
+const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 const getEst = id => db.ests.find(e => e.id === id);
 
-function getVendorSub() {
-  const e = getEst(db.cur);
-  if (!e) return 0;
-  const p = e.pr || {};
-  const iS = arr => (arr || []).reduce((s, it) => s + (parseFloat(it.qty) || 0) * (parseFloat(it.unitPrice) || 0), 0);
-  return p.auto !== false ? iS(e.lumber) + iS(e.hardware) : (p.orv || 0);
+const TAX_RATE = 0.0725; // Utah
+const itemsSub = arr => (arr || []).reduce((s, it) => s + num(it.qty) * num(it.unitPrice), 0);
+
+/* All estimate money math lives here; every screen and document reads from it. */
+function calc(e) {
+  const p = e.pr || {}, l = e.lb || {};
+  const lSub = itemsSub(e.lumber), hSub = itemsSub(e.hardware);
+  const vendSub = p.auto !== false ? lSub + hSub : (p.orv || 0);
+  const ucMode = p.ucMode || '%', ucVal = p.ucVal || 0;
+  const uc = ucMode === '%' ? vendSub * (ucVal / 100) : ucVal;
+  // Tax/delivery not included in the vendor price: we pay them on top and pass them on.
+  const tax = p.taxInc !== false ? 0 : (p.taxAuto !== false ? Math.round(vendSub * TAX_RATE) : (p.tax || 0));
+  const del = p.delInc !== false ? 0 : (p.del || 0);
+  const buf = p.buf || 0;
+  const clientMat = vendSub + uc + tax + buf + del;
+  const cliLab = l.cliLab || 0, cliDemo = l.cliDemo || 0;
+  const cliLabTotal = cliLab + cliDemo;
+  const grand = clientMat + cliLabTotal;
+  const matCost = vendSub + tax + del;
+  const subCost = l.subCost || 0, mgmt = e.mgmtLabor || 0;
+  const expenses = matCost + subCost + mgmt;
+  const profit = grand - expenses;
+  const margin = grand > 0 ? (profit / grand) * 100 : 0;
+  return { lSub, hSub, vendSub, ucMode, ucVal, uc, tax, del, buf, clientMat, cliLab, cliDemo, cliLabTotal,
+           grand, matCost, subCost, mgmt, expenses, profit, margin };
 }
 
 /* ══════════════════════════════════════════
@@ -782,6 +891,7 @@ function goList() {
 
 function goEdit(id) {
   db.cur = id;
+  rateLearnSub = null;
   document.getElementById('list-view').classList.remove('on');
   document.getElementById('edit-view').classList.add('on');
   document.getElementById('bot-bar').style.display = 'flex';
@@ -798,9 +908,9 @@ function newEst() {
   db.ests.unshift({
     id,
     client: '', company: '', pm: '', pmOther: '',
-    status: 'draft', address: '', notes: '',
+    status: 'draft', address: '', notes: '', createdAt: Date.now(),
     lumber: [], hardware: [],
-    pr: { auto: true, orv: 0, taxInc: true, tax: 0, ucMode: '%', ucVal: 20, buf: 300, delInc: true, del: 0 },
+    pr: { auto: true, orv: 0, taxInc: true, taxAuto: true, tax: 0, ucMode: '%', ucVal: 20, buf: 300, delInc: true, del: 0 },
     lb: { name: '', days: '', daily: 0, subCost: 0, cliLab: 0, cliDemo: 0 },
     mgmtLabor: 0, mgmtHours: 0
   });
@@ -848,7 +958,6 @@ function loadForm(id) {
   document.getElementById('vendor-or').value = p.orv || '';
   document.getElementById('tax-inc').checked = p.taxInc !== false;
   document.getElementById('tax-amt').style.display = p.taxInc !== false ? 'none' : 'block';
-  document.getElementById('tax-auto-badge').style.display = p.taxInc !== false ? 'none' : 'inline';
   document.getElementById('tax-amt').value = p.tax || '';
   document.getElementById('uc-val').value = p.ucVal !== undefined ? p.ucVal : 20;
   setUCMode(p.ucMode || '%', false);
@@ -870,7 +979,6 @@ function loadForm(id) {
 
   renderItems('lumber', e.lumber || []);
   renderItems('hardware', e.hardware || []);
-  refreshRateBadges();
   rc();
 }
 
@@ -900,37 +1008,64 @@ function sv() {
   const autoV = document.getElementById('auto-vendor').checked;
   document.getElementById('vendor-or-row').style.display = autoV ? 'none' : 'flex';
 
+  const prevPr = e.pr || {};
   e.pr = {
     auto: autoV,
-    orv: parseFloat(document.getElementById('vendor-or').value) || 0,
+    orv: num(document.getElementById('vendor-or').value),
     taxInc: document.getElementById('tax-inc').checked,
-    tax: parseFloat(document.getElementById('tax-amt').value) || 0,
-    ucMode: (e.pr && e.pr.ucMode) || '%',
-    ucVal: parseFloat(document.getElementById('uc-val').value) || 0,
-    buf: parseFloat(document.getElementById('buf-val').value) || 0,
+    taxAuto: prevPr.taxAuto !== false,
+    tax: num(document.getElementById('tax-amt').value),
+    ucMode: prevPr.ucMode || '%',
+    ucVal: num(document.getElementById('uc-val').value),
+    buf: num(document.getElementById('buf-val').value),
     delInc: document.getElementById('del-inc').checked,
-    del: parseFloat(document.getElementById('del-amt').value) || 0
+    del: num(document.getElementById('del-amt').value)
   };
 
+  const prevLb = e.lb || {};
   const subSel = document.getElementById('sub-sel');
-  const subName = subSel.value === '__add__' ? (e.lb && e.lb.name) || '' : subSel.value;
-  const daily = parseFloat(document.getElementById('sub-daily').value) || 0;
+  const subName = subSel.value === '__add__' ? prevLb.name || '' : subSel.value;
+  const daily = num(document.getElementById('sub-daily').value);
   e.lb = {
     name: subName,
     days: document.getElementById('sub-days').value,
     daily: daily,
-    subCost: parseFloat(document.getElementById('sub-cost').value) || 0,
-    cliLab: parseFloat(document.getElementById('cli-labor').value) || 0,
-    cliDemo: parseFloat(document.getElementById('cli-demo').value) || 0
+    subCost: num(document.getElementById('sub-cost').value),
+    cliLab: num(document.getElementById('cli-labor').value),
+    cliDemo: num(document.getElementById('cli-demo').value),
+    subCostManual: !!prevLb.subCostManual,
+    cliLabManual: !!prevLb.cliLabManual
   };
-  // keep the sub's typical daily rate in sync on the saved sub record
-  if (subName) {
+  // A sub just created from this estimate learns the daily rate typed here.
+  // Otherwise the saved rate is only changed in the menu.
+  if (subName && subName === rateLearnSub) {
     const rec = db.subs.find(s => s.name === subName);
     if (rec) rec.daily = daily;
   }
-  e.mgmtLabor = parseFloat(document.getElementById('mgmt-labor').value) || 0;
-  e.mgmtHours = parseFloat(document.getElementById('mgmt-hours').value) || 0;
+  e.mgmtLabor = num(document.getElementById('mgmt-labor').value);
+  e.mgmtHours = num(document.getElementById('mgmt-hours').value);
   dbSave();
+}
+
+// Labor/managing amounts typed by hand are never overwritten by auto-calc.
+// Clearing the field hands it back to auto-calc.
+function onManualAmt(field) {
+  const e = getEst(db.cur); if (!e) return;
+  if (field === 'mgmt') {
+    e.mgmtManual = document.getElementById('mgmt-labor').value.trim() !== '';
+  } else {
+    const id = field === 'subCost' ? 'sub-cost' : 'cli-labor';
+    e.lb = e.lb || {};
+    e.lb[field + 'Manual'] = document.getElementById(id).value.trim() !== '';
+  }
+  sv(); rc();
+}
+
+function onTaxAmtInput() {
+  const e = getEst(db.cur); if (!e) return;
+  e.pr = e.pr || {};
+  e.pr.taxAuto = document.getElementById('tax-amt').value.trim() === '';
+  sv(); rc();
 }
 
 /* ══════════════════════════════════════════
@@ -952,8 +1087,10 @@ function populateCompanies(selected) {
     opts.push(`<option value="${esc(c)}">${esc(c)}</option>`);
   });
   opts.push('<option value="__add__">+ Add new company...</option>');
+  // A company deleted from the list stays on the estimates that already use it.
+  if (selected && !db.companies.includes(selected)) opts.splice(1, 0, `<option value="${esc(selected)}">${esc(selected)} (removed)</option>`);
   sel.innerHTML = opts.join('');
-  sel.value = (selected && db.companies.includes(selected)) ? selected : '';
+  sel.value = selected || '';
 }
 function onCompanyChange() {
   const sel = document.getElementById('f-companysel');
@@ -965,31 +1102,31 @@ function onCompanyChange() {
   sv();
 }
 
-/* ── Labor auto-calc: days × rate ── */
-function recalcLabor() {
-  const days = parseFloat(document.getElementById('sub-days').value) || 0;
-  const daily = parseFloat(document.getElementById('sub-daily').value) || 0;
-  const subCost = days * daily;
-  const cliLabor = days * (db.settings.clientDayRate || 0);
-  document.getElementById('sub-cost').value = subCost ? subCost : '';
-  document.getElementById('cli-labor').value = cliLabor ? cliLabor : '';
+/* ── Labor auto-calc: days × rate ──
+   source: 'days' | 'daily' | 'sub' (inputs on the estimate) or 'rate' (client $/day changed in the menu).
+   Amounts typed by hand are left alone; each amount only reacts to the inputs it depends on. */
+function recalcLabor(source) {
+  const e = getEst(db.cur); if (!e) return;
+  const l = e.lb || {};
+  const days = num(document.getElementById('sub-days').value);
+  const daily = num(document.getElementById('sub-daily').value);
+  const set = (id, v) => { document.getElementById(id).value = v ? round2(v) : ''; };
+  if (!l.subCostManual && source !== 'rate') set('sub-cost', days * daily);
+  if (!l.cliLabManual && (source === 'days' || (source === 'rate' && days))) set('cli-labor', days * (db.settings.clientDayRate || 0));
   sv(); rc();
 }
 
 /* ── Managing labor auto-calc: hours × rate ── */
-function recalcMgmt() {
-  const hrs = parseFloat(document.getElementById('mgmt-hours').value) || 0;
-  const amt = hrs * (db.settings.mgmtHourRate || 0);
-  if (hrs) document.getElementById('mgmt-labor').value = amt ? amt : '';
+function recalcMgmt(source) {
+  const e = getEst(db.cur); if (!e) return;
+  const hrs = num(document.getElementById('mgmt-hours').value);
+  if (!e.mgmtManual && (hrs || source === 'hours')) {
+    const amt = hrs * (db.settings.mgmtHourRate || 0);
+    document.getElementById('mgmt-labor').value = amt ? round2(amt) : '';
+  }
   sv(); rc();
 }
 
-function refreshRateBadges() {
-  const cb = document.getElementById('cli-rate-badge');
-  const mb = document.getElementById('mgmt-rate-badge');
-  if (cb) cb.textContent = '$' + Number(db.settings.clientDayRate || 0).toLocaleString() + '/day';
-  if (mb) mb.textContent = '$' + Number(db.settings.mgmtHourRate || 0).toLocaleString() + '/hr';
-}
 
 /* ── Subs dropdown ── */
 function populateSubs(selected) {
@@ -999,20 +1136,24 @@ function populateSubs(selected) {
     opts.push(`<option value="${esc(s.name)}">${esc(s.name)}</option>`);
   });
   opts.push('<option value="__add__">+ Add new sub...</option>');
+  if (selected && !db.subs.find(s => s.name === selected)) opts.splice(1, 0, `<option value="${esc(selected)}">${esc(selected)} (removed)</option>`);
   sel.innerHTML = opts.join('');
-  sel.value = (selected && db.subs.find(s => s.name === selected)) ? selected : '';
+  sel.value = selected || '';
 }
 function fillSubRates(name) {
   const rec = db.subs.find(s => s.name === name);
-  document.getElementById('sub-daily').value = rec && rec.daily ? rec.daily : '';
+  if (rec) document.getElementById('sub-daily').value = rec.daily ? rec.daily : '';
 }
+let rateLearnSub = null; // sub created from the open estimate; it learns the rate typed there
 function onSubChange() {
   const sel = document.getElementById('sub-sel');
   if (sel.value === '__add__') {
     const n = (prompt('New sub name') || '').trim();
     if (n) {
-      if (!db.subs.find(s => s.name === n)) db.subs.push({ name: n, daily: 0 });
-      dbSave(); populateSubs(n); fillSubRates(n);
+      const rec = db.subs.find(s => s.name.toLowerCase() === n.toLowerCase());
+      const name = rec ? rec.name : n;
+      if (!rec) { db.subs.push({ name: n, daily: 0 }); rateLearnSub = n; }
+      dbSave(); populateSubs(name); fillSubRates(name);
     } else {
       const cur = getEst(db.cur);
       populateSubs(cur && cur.lb ? cur.lb.name : '');
@@ -1020,12 +1161,13 @@ function onSubChange() {
   } else {
     fillSubRates(sel.value);
   }
-  recalcLabor();
+  recalcLabor('sub');
 }
 
 /* ── Top-bar overflow menu ── */
 function toggleMenu(ev) {
   if (ev) ev.stopPropagation();
+  renderBackupHint();
   document.getElementById('topmenu').classList.toggle('on');
 }
 function closeMenu() { document.getElementById('topmenu').classList.remove('on'); }
@@ -1033,6 +1175,108 @@ document.addEventListener('click', function(ev) {
   const m = document.getElementById('topmenu'), b = document.getElementById('menu-btn');
   if (m.classList.contains('on') && !m.contains(ev.target) && !b.contains(ev.target)) closeMenu();
 });
+
+/* ── Backup: export / import the whole db as JSON ── */
+const BACKUP_KEY = STORE_KEY + '-lastbackup';
+const dateStamp = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const plural = (n, w, ws) => n + ' ' + (n === 1 ? w : (ws || w + 's'));
+function dbCounts(d) {
+  return plural((d.ests || []).length, 'estimate') + ', ' + plural((d.companies || []).length, 'company', 'companies') + ', ' +
+    plural((d.subs || []).length, 'sub') + ', ' + plural(Object.keys(d.prices || {}).length, 'saved price');
+}
+
+function renderBackupHint() {
+  const days = lastBackupDays();
+  document.getElementById('backup-hint').textContent = days == null ? 'Never backed up'
+    : 'Last backed up ' + (days <= 0 ? 'today' : days === 1 ? 'yesterday' : days + ' days ago');
+}
+function markBackedUp() { try { localStorage.setItem(BACKUP_KEY, String(Date.now())); } catch(e) {} renderBackupNag(); }
+function lastBackupDays() {
+  let t = null;
+  try { t = parseInt(localStorage.getItem(BACKUP_KEY), 10) || null; } catch(e) {}
+  return t ? Math.round((new Date().setHours(0,0,0,0) - new Date(t).setHours(0,0,0,0)) / 864e5) : null;
+}
+// Everything lives only on this phone, so nag on the list screen when a backup is due.
+const BACKUP_EVERY_DAYS = 7;
+function renderBackupNag() {
+  const days = lastBackupDays();
+  const due = db.ests.length > 0 && (days == null || days >= BACKUP_EVERY_DAYS);
+  document.getElementById('backup-nag').classList.toggle('on', due);
+  if (due) document.getElementById('backup-nag-txt').textContent = days == null
+    ? 'Your estimates are only saved on this phone and have never been backed up.'
+    : `Last backup was ${days} days ago. Back up so nothing is lost if this phone is.`;
+}
+
+let toastTimer = null;
+function toast(msg, actLabel, act) {
+  const el = document.getElementById('toast'), btn = document.getElementById('toast-act');
+  document.getElementById('toast-msg').textContent = msg;
+  btn.style.display = actLabel ? 'block' : 'none';
+  btn.textContent = actLabel || '';
+  btn.onclick = () => { el.classList.remove('on'); if (act) act(); };
+  el.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('on'), 6000);
+}
+
+function exportBackup() {
+  const name = 'quickquote-backup-' + dateStamp(new Date()) + '.json';
+  const json = JSON.stringify(db, null, 2);
+  const download = () => {
+    const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    markBackedUp();
+  };
+  let file = null;
+  try { file = new File([json], name, { type: 'application/json' }); } catch(e) {}
+  if (file && navigator.canShare && navigator.share && navigator.canShare({ files: [file] })) {
+    navigator.share({ files: [file], title: name }).then(markBackedUp).catch(err => { if (!err || err.name !== 'AbortError') download(); });
+  } else download();
+}
+
+function validBackup(d) {
+  const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
+  if (!isObj(d) || !Array.isArray(d.ests)) return false;
+  if (!d.ests.every(e => isObj(e) && typeof e.id === 'string')) return false;
+  if (d.companies != null && !Array.isArray(d.companies)) return false;
+  if (d.subs != null && !Array.isArray(d.subs)) return false;
+  if (d.prices != null && !isObj(d.prices)) return false;
+  if (d.settings != null && !isObj(d.settings)) return false;
+  return true;
+}
+
+function importBackup(inp) {
+  const f = inp.files && inp.files[0];
+  inp.value = '';
+  if (!f) return;
+  const bad = () => alert('That file isn\'t a QuickQuote backup. Nothing was changed.');
+  const rd = new FileReader();
+  rd.onerror = () => alert('Couldn\'t read that file. Nothing was changed.');
+  rd.onload = () => {
+    let d;
+    try { d = JSON.parse(rd.result); } catch(e) { bad(); return; }
+    if (!validBackup(d)) { bad(); return; }
+    if (!confirm('Restore backup "' + f.name + '"?\n\nBackup has: ' + dbCounts(d) +
+      '.\n\nThis replaces all current data — ' + dbCounts(db) + '. This can\'t be undone.')) return;
+    const prev = localStorage.getItem(STORE_KEY);
+    d.cur = null;
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); }
+    catch(e) {
+      try { if (prev != null) localStorage.setItem(STORE_KEY, prev); } catch(e2) {}
+      alert('Couldn\'t save the backup on this device. Nothing was changed.');
+      return;
+    }
+    dbLoad(); dbSave();
+    document.getElementById('manage-modal').classList.remove('on');
+    document.getElementById('share-modal').classList.remove('on');
+    goList();
+    alert('Backup restored — ' + dbCounts(db) + '.');
+  };
+  rd.readAsText(f);
+}
 
 /* ── Manage modal (clients / subs / saved prices) ── */
 function openManage() { renderManage(); document.getElementById('manage-modal').classList.add('on'); }
@@ -1053,9 +1297,8 @@ function updRate(key, val) {
   db.settings[key] = parseFloat(val) || 0;
   dbSave();
   if (document.getElementById('edit-view').classList.contains('on') && getEst(db.cur)) {
-    refreshRateBadges();
-    recalcLabor();
-    recalcMgmt();
+    if (key === 'clientDayRate') recalcLabor('rate');
+    if (key === 'mgmtHourRate') recalcMgmt('rate');
   }
 }
 
@@ -1072,7 +1315,14 @@ function addCompany() {
   if (!db.companies.includes(n)) db.companies.push(n);
   inp.value = ''; dbSave(); renderCompanies();
 }
-function rmCompany(i) { db.companies.splice(i, 1); dbSave(); renderCompanies(); }
+function confirmRemove(name, used) {
+  return confirm(`Remove "${name}" from the list?` + (used ? `\n\n${plural(used, 'estimate')} still use it and will keep the name.` : ''));
+}
+function rmCompany(i) {
+  const c = db.companies[i]; if (c == null) return;
+  if (!confirmRemove(c, db.ests.filter(e => e.company === c).length)) return;
+  db.companies.splice(i, 1); dbSave(); renderCompanies();
+}
 
 function renderSubs() {
   const el = document.getElementById('sub-list');
@@ -1080,7 +1330,7 @@ function renderSubs() {
   el.innerHTML = db.subs.map((s, i) =>
     `<div class="mg-row">
        <div class="nm">${esc(s.name)}</div>
-       <span class="rate-lbl">$</span><input class="sub-rate" type="number" min="0" step="0.01" value="${esc(s.daily || '')}" placeholder="day" onchange="updSubRate(${i},'daily',this.value)"/>
+       <span class="rate-lbl">$</span><input class="sub-rate" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(s.daily || '')}" placeholder="day" onchange="updSubRate(${i},'daily',this.value)"/>
        <span class="rate-lbl">/day</span>
        <button class="mg-x" onclick="rmSub(${i})">×</button>
      </div>`).join('');
@@ -1095,8 +1345,12 @@ function addSub() {
   document.getElementById('new-sub-daily').value = '';
   dbSave(); renderSubs();
 }
-function rmSub(i) { db.subs.splice(i, 1); dbSave(); renderSubs(); }
-function updSubRate(i, field, val) { if (db.subs[i]) { db.subs[i][field] = parseFloat(val) || 0; dbSave(); } }
+function rmSub(i) {
+  const s = db.subs[i]; if (!s) return;
+  if (!confirmRemove(s.name, db.ests.filter(e => e.lb && e.lb.name === s.name).length)) return;
+  db.subs.splice(i, 1); dbSave(); renderSubs();
+}
+function updSubRate(i, field, val) { if (db.subs[i]) { db.subs[i][field] = num(val); dbSave(); } }
 
 let _priceKeys = [];
 function renderPrices() {
@@ -1104,9 +1358,9 @@ function renderPrices() {
   _priceKeys = Object.keys(db.prices).sort();
   if (!_priceKeys.length) { el.innerHTML = '<div class="mg-empty">No saved prices yet.</div>'; return; }
   el.innerHTML = _priceKeys.map((k, i) =>
-    `<div class="mg-row"><div class="nm">${esc(k)}</div><span class="rate-lbl">$</span><input class="sub-rate" type="number" min="0" step="0.01" value="${esc(db.prices[k])}" onchange="updPrice(${i},this.value)"/><button class="mg-x" onclick="rmPrice(${i})">×</button></div>`).join('');
+    `<div class="mg-row"><div class="nm">${esc(k)}</div><span class="rate-lbl">$</span><input class="sub-rate" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(db.prices[k])}" onchange="updPrice(${i},this.value)"/><button class="mg-x" onclick="rmPrice(${i})">×</button></div>`).join('');
 }
-function updPrice(i, val) { const k = _priceKeys[i]; if (k != null) { db.prices[k] = parseFloat(val) || 0; dbSave(); } }
+function updPrice(i, val) { const k = _priceKeys[i]; if (k != null) { db.prices[k] = num(val); dbSave(); } }
 function rmPrice(i) { const k = _priceKeys[i]; if (k != null) { delete db.prices[k]; dbSave(); renderPrices(); } }
 
 function onTaxChange() {
@@ -1114,11 +1368,19 @@ function onTaxChange() {
   const taxAmt = document.getElementById('tax-amt');
   const badge = document.getElementById('tax-auto-badge');
   taxAmt.style.display = taxInc ? 'none' : 'block';
-  badge.style.display = taxInc ? 'none' : 'inline';
-  if (!taxInc) {
-    const vS = getVendorSub();
-    const autoTax = Math.round(vS * 0.0725);
-    taxAmt.value = autoTax || '';
+  // Unticking starts over on the automatic Utah rate; rc() fills in the amount.
+  const e = getEst(db.cur);
+  if (e && !taxInc) { e.pr = e.pr || {}; e.pr.taxAuto = true; }
+  sv(); rc();
+}
+
+function onAutoVendorChange() {
+  // Switching to an override starts from the current line-item total, not $0.
+  const orv = document.getElementById('vendor-or');
+  const e = getEst(db.cur);
+  if (e && !document.getElementById('auto-vendor').checked && !orv.value) {
+    const v = round2(itemsSub(e.lumber) + itemsSub(e.hardware));
+    orv.value = v || '';
   }
   sv(); rc();
 }
@@ -1153,125 +1415,147 @@ function rc() {
   const e = getEst(db.cur);
   if (!e) return;
 
-  const iS = arr => (arr || []).reduce((s, it) => s + (parseFloat(it.qty) || 0) * (parseFloat(it.unitPrice) || 0), 0);
-  const lSub = iS(e.lumber), hSub = iS(e.hardware);
-  document.getElementById('lumber-sub-lbl').textContent = lSub > 0 ? fmt(lSub) : '';
-  document.getElementById('hardware-sub-lbl').textContent = hSub > 0 ? fmt(hSub) : '';
+  const c = calc(e), p = e.pr || {}, l = e.lb || {};
+  const set = (id, txt) => { document.getElementById(id).textContent = txt; };
+  set('lumber-sub-lbl', c.lSub > 0 ? fmt(c.lSub) : '');
+  set('hardware-sub-lbl', c.hSub > 0 ? fmt(c.hSub) : '');
+  set('vendor-disp', fmt(c.vendSub));
 
-  const p = e.pr || {};
-  const vendSub = p.auto !== false ? lSub + hSub : (p.orv || 0);
-  document.getElementById('vendor-disp').textContent = fmt(vendSub);
-
-  const ucVal = p.ucVal || 0, ucMode = p.ucMode || '%';
-  const ucAmt = ucMode === '%' ? vendSub * (ucVal / 100) : ucVal;
   const hint = document.getElementById('uc-hint');
-  if (ucMode === '%' && ucVal > 0) {
+  if (c.ucMode === '%' && c.ucVal > 0) {
     hint.style.display = 'block';
-    hint.textContent = `${ucVal}% of ${fmt(vendSub)} = ${fmt(ucAmt)}`;
+    hint.textContent = `${c.ucVal}% of ${fmt(c.vendSub)} = ${fmt(c.uc)}`;
   } else hint.style.display = 'none';
 
-  const taxAmt = p.taxInc ? 0 : (p.tax || 0);
-  const delAmt = p.delInc ? 0 : (p.del || 0);
-  const bufAmt = p.buf || 0;
-  const clientMat = vendSub + ucAmt + taxAmt + bufAmt + delAmt;
-  document.getElementById('client-mat-total').textContent = fmt(clientMat);
+  // Automatic tax follows the vendor subtotal; a typed amount stays as typed.
+  const taxAuto = p.taxInc === false && p.taxAuto !== false;
+  const taxInp = document.getElementById('tax-amt');
+  if (taxAuto && document.activeElement !== taxInp) taxInp.value = c.tax || '';
+  document.getElementById('tax-auto-badge').style.display = taxAuto ? 'inline' : 'none';
 
-  const l = e.lb || {};
-  const cliLabTotal = (l.cliLab || 0) + (l.cliDemo || 0);
-  const subLabTotal = (l.subCost || 0);
-  const grandTotal = clientMat + cliLabTotal;
-  const expenses = vendSub + subLabTotal + (e.mgmtLabor || 0);
-  const profit = grandTotal - expenses;
-  const margin = grandTotal > 0 ? (profit / grandTotal) * 100 : 0;
+  // Badges say whether an amount is auto-calculated or was typed by hand.
+  const badge = (id, manual, autoTxt) => { const b = document.getElementById(id); b.textContent = manual ? 'typed' : autoTxt; b.classList.toggle('manual', !!manual); };
+  badge('sub-cost-badge', l.subCostManual, 'days × rate');
+  badge('cli-rate-badge', l.cliLabManual, '$' + Number(db.settings.clientDayRate || 0).toLocaleString() + '/day');
+  badge('mgmt-rate-badge', e.mgmtManual, '$' + Number(db.settings.mgmtHourRate || 0).toLocaleString() + '/hr');
 
-  document.getElementById('gt-amount').textContent = fmt(grandTotal);
-  document.getElementById('gt-margin').textContent = grandTotal > 0 ? margin.toFixed(1) + '%' : '—';
-  document.getElementById('s-mat').textContent = fmt(clientMat);
-  document.getElementById('s-lab').textContent = fmt(cliLabTotal);
-  document.getElementById('s-gt').textContent = fmt(grandTotal);
-  document.getElementById('s-e-mat').textContent = fmt(vendSub);
-  document.getElementById('s-e-lab').textContent = fmt(subLabTotal);
-  document.getElementById('s-e-mgmt').textContent = fmt(e.mgmtLabor || 0);
-  document.getElementById('s-exp').textContent = fmt(expenses);
-  document.getElementById('s-profit').textContent = fmt(profit);
+  set('client-mat-total', fmt(c.clientMat));
+  set('gt-amount', fmt(c.grand));
+  set('gt-margin', c.grand > 0 ? c.margin.toFixed(1) + '%' : '—');
+  set('s-mat', fmt(c.clientMat));
+  set('s-lab', fmt(c.cliLabTotal));
+  set('s-gt', fmt(c.grand));
+  set('s-e-mat', fmt(c.vendSub));
+  document.getElementById('s-e-taxdel-row').style.display = (c.tax || c.del) ? 'flex' : 'none';
+  set('s-e-taxdel', fmt(c.tax + c.del));
+  set('s-e-lab', fmt(c.subCost));
+  set('s-e-mgmt', fmt(c.mgmt));
+  set('s-exp', fmt(c.expenses));
+  set('s-profit', fmt(c.profit));
 
-  const pct = Math.max(0, Math.min(100, margin));
+  const pct = Math.max(0, Math.min(100, c.margin));
   const fill = document.getElementById('pbar-fill');
   fill.style.width = pct + '%';
-  fill.style.background = margin >= 40 ? '#16a34a' : margin >= 25 ? '#ca8a04' : '#dc2626';
-  document.getElementById('pbar-lbl').textContent = grandTotal > 0 ? margin.toFixed(1) + '% profit margin' : '';
+  fill.style.background = c.margin >= 40 ? '#16a34a' : c.margin >= 25 ? '#ca8a04' : '#dc2626';
+  set('pbar-lbl', c.grand > 0 ? c.margin.toFixed(1) + '% profit margin' : '');
 }
 
 /* ══════════════════════════════════════════
    LINE ITEMS
 ══════════════════════════════════════════ */
+const lineTotHtml = it => { const q = num(it.qty), u = num(it.unitPrice);
+  return (q && u) ? `<span style="color:var(--text)">${fmt2(q*u)}</span>` : `<span class="irow-none">—</span>`; };
+
 function renderItems(type, arr) {
   const tb = document.getElementById(`${type}-tb`);
   tb.innerHTML = arr.map((it, i) => {
-    const q = parseFloat(it.qty) || 0, u = parseFloat(it.unitPrice) || 0;
-    const totHtml = (q && u) ? `<span style="color:var(--text)">${fmt(q*u)}</span>` : `<span style="color:#e2e8f0">—</span>`;
+    const qty = it.qty === '' || it.qty == null ? '' : it.qty;
     return `<tr>
-      <td style="padding-left:10px;"><input class="iinp qty" type="number" min="1" value="${esc(it.qty||1)}" oninput="updItem('${type}',${i},'qty',this.value)"/></td>
-      <td style="padding:5px 4px;"><input class="iinp" type="text" value="${esc(it.desc||'')}" placeholder="Description" style="width:100%;min-width:110px;" oninput="updItem('${type}',${i},'desc',this.value)"/></td>
-      <td><input class="iinp price" id="${type}-price-${i}" type="number" min="0" step="0.01" value="${esc(it.unitPrice||'')}" placeholder="—" oninput="updItem('${type}',${i},'unitPrice',this.value)"/></td>
-      <td><div class="irow-tot" id="${type}-tot-${i}">${totHtml}</div></td>
-      <td style="white-space:nowrap;padding-right:10px;text-align:right;"><button class="lkp-btn" onclick="lookupPrice('${type}',${i})" title="Look up price on Home Depot">🔍</button><button class="del-btn" onclick="rmItem('${type}',${i})">×</button></td>
+      <td class="c-qty"><input class="iinp qty" type="number" inputmode="decimal" min="0" value="${esc(qty)}" placeholder="0" aria-label="Qty" oninput="updItem('${type}',${i},'qty',this.value)"/></td>
+      <td class="c-desc"><input class="iinp desc" type="text" value="${esc(it.desc||'')}" placeholder="Description" oninput="updItem('${type}',${i},'desc',this.value)" onchange="learnPrice('${type}',${i})"/></td>
+      <td class="c-price"><input class="iinp price" id="${type}-price-${i}" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(it.unitPrice)}" placeholder="Unit $" aria-label="Unit price" oninput="updItem('${type}',${i},'unitPrice',this.value)"/></td>
+      <td class="c-tot"><div class="irow-tot" id="${type}-tot-${i}">${lineTotHtml(it)}</div></td>
+      <td class="c-act"><button class="lkp-btn" onclick="lookupPrice('${type}',${i})" title="Look up price on Home Depot" aria-label="Look up price">🔍</button><button class="del-btn" onclick="rmItem('${type}',${i})" aria-label="Remove item">×</button></td>
     </tr>`;
   }).join('');
 }
 
-function addItem(type, desc) {
+function addItem(type, desc, focus = true) {
   const e = getEst(db.cur);
   if (!e) return;
-  let price = '';
-  if (desc) { const k = priceKey(desc); if (db.prices[k] != null) price = db.prices[k]; }
-  e[type].push({ qty: 1, desc: desc || '', unitPrice: price });
+  let price = '', auto = false;
+  if (desc) { const k = priceKey(desc); if (db.prices[k] != null) { price = db.prices[k]; auto = true; } }
+  e[type].push({ qty: 1, desc: desc || '', unitPrice: price, autoPriced: auto });
   dbSave();
   renderItems(type, e[type]);
   rc();
+  if (!focus) return;
   const rows = document.getElementById(`${type}-tb`).querySelectorAll('tr');
   const last = rows[rows.length - 1];
   if (last) {
-    const target = desc ? last.querySelector('.iinp.price') : last.querySelectorAll('input')[1];
+    const target = desc ? last.querySelector('.iinp.price') : last.querySelector('.iinp.desc');
     if (target) target.focus();
   }
 }
 
+// Quick picks: tapping the same size again adds one more instead of a new row,
+// and the keyboard isn't opened (it would shift the chips under your finger).
 function quickAdd(type, desc) {
-  addItem(type, desc);
-}
-
-function rmItem(type, i) {
   const e = getEst(db.cur);
   if (!e) return;
-  e[type].splice(i, 1);
+  const it = e[type].find(x => priceKey(x.desc) === priceKey(desc));
+  if (it) {
+    it.qty = num(it.qty) + 1;
+    dbSave(); renderItems(type, e[type]); rc();
+  } else addItem(type, desc, false);
+}
+
+let lastRemoved = null;
+function rmItem(type, i) {
+  const e = getEst(db.cur);
+  if (!e || !e[type][i]) return;
+  const [it] = e[type].splice(i, 1);
+  lastRemoved = { estId: e.id, type, i, it };
   dbSave(); renderItems(type, e[type]); rc();
+  toast(`Removed ${it.desc ? '"' + it.desc + '"' : 'item'}`, 'Undo', undoRemove);
+}
+function undoRemove() {
+  const r = lastRemoved; lastRemoved = null;
+  const e = r && getEst(r.estId);
+  if (!e || e.id !== db.cur) return;
+  e[r.type].splice(Math.min(r.i, e[r.type].length), 0, r.it);
+  dbSave(); renderItems(r.type, e[r.type]); rc();
 }
 
 function updItem(type, i, field, val) {
   const e = getEst(db.cur);
-  if (!e || !e[type][i]) return;
-  if (field === 'qty') e[type][i].qty = parseFloat(val) || 1;
-  else if (field === 'unitPrice') e[type][i].unitPrice = val === '' ? '' : parseFloat(val) || 0;
-  else e[type][i][field] = val;
-  // learn price into the price book
-  if (field === 'unitPrice' && val !== '') {
-    const k = priceKey(e[type][i].desc);
-    if (k) db.prices[k] = parseFloat(val) || 0;
-  }
-  // autofill last-used price when a known material is typed in
-  if (field === 'desc') {
+  const it = e && e[type][i];
+  if (!it) return;
+  if (field === 'qty') it.qty = val === '' ? '' : num(val);
+  else if (field === 'unitPrice') { it.unitPrice = val === '' ? '' : num(val); it.autoPriced = false; learnPrice(type, i); }
+  else it[field] = val;
+  // Fill in the saved price for a known material. Only a price we filled in ourselves
+  // is ever replaced, so typing "2x4 8' PT" moves from the 2x4 8' price to the PT one.
+  if (field === 'desc' && (it.autoPriced || it.unitPrice === '' || it.unitPrice == null)) {
     const k = priceKey(val);
-    if (k && db.prices[k] != null && (e[type][i].unitPrice === '' || e[type][i].unitPrice == null)) {
-      e[type][i].unitPrice = db.prices[k];
-      const pe = document.getElementById(`${type}-price-${i}`);
-      if (pe) pe.value = db.prices[k];
-    }
+    const hit = k && db.prices[k] != null;
+    it.unitPrice = hit ? db.prices[k] : '';
+    it.autoPriced = !!hit;
+    const pe = document.getElementById(`${type}-price-${i}`);
+    if (pe) pe.value = it.unitPrice;
   }
-  const q = parseFloat(e[type][i].qty) || 0, u = parseFloat(e[type][i].unitPrice) || 0;
   const totEl = document.getElementById(`${type}-tot-${i}`);
-  if (totEl) totEl.innerHTML = (q && u) ? `<span style="color:var(--text)">${fmt(q*u)}</span>` : `<span style="color:#e2e8f0">—</span>`;
+  if (totEl) totEl.innerHTML = lineTotHtml(it);
   dbSave(); rc();
+}
+
+// Remember a typed price in the price book (also when the description is finished after the price).
+function learnPrice(type, i) {
+  const e = getEst(db.cur);
+  const it = e && e[type][i];
+  if (!it || it.autoPriced || it.unitPrice === '' || it.unitPrice == null) return;
+  const k = priceKey(it.desc);
+  if (k) { db.prices[k] = num(it.unitPrice); dbSave(); }
 }
 
 /* ══════════════════════════════════════════
@@ -1374,17 +1658,10 @@ function stopMic() {
 /* ══════════════════════════════════════════
    LIST VIEW
 ══════════════════════════════════════════ */
-function calcGrandTotal(e) {
-  const iS = arr => (arr||[]).reduce((s,it)=>s+(parseFloat(it.qty)||0)*(parseFloat(it.unitPrice)||0),0);
-  const p = e.pr || {};
-  const vS = p.auto!==false ? iS(e.lumber)+iS(e.hardware) : (p.orv||0);
-  const uc = p.ucMode==='%' ? vS*((p.ucVal||0)/100) : (p.ucVal||0);
-  const mat = vS+uc+(p.taxInc?0:p.tax||0)+(p.buf||0)+(p.delInc?0:p.del||0);
-  const l = e.lb||{};
-  return mat+(l.cliLab||0)+(l.cliDemo||0);
-}
+function calcGrandTotal(e) { return calc(e).grand; }
 
 function renderList() {
+  renderBackupNag();
   const el = document.getElementById('est-list');
   if (!db.ests.length) {
     el.innerHTML=`<div class="empty-state"><div class="empty-msg">No estimates yet</div><div class="empty-sub">Tap above to create one</div></div>`;
@@ -1413,8 +1690,8 @@ function orderMaterials() {
   const e = getEst(db.cur);
   if (!e) return;
   const bullets = arr => (arr || [])
-    .filter(it => (it.desc || '').trim())
-    .map(it => `• (${parseFloat(it.qty) || 1}) ${it.desc.trim()}`);
+    .filter(it => num(it.qty) > 0 && ((it.desc || '').trim() || num(it.unitPrice)))
+    .map(it => `• (${num(it.qty)}) ${(it.desc || '').trim() || '(no description)'}`);
   const lum = bullets(e.lumber), hw = bullets(e.hardware);
   if (!lum.length && !hw.length) {
     alert('Add some lumber or hardware items first, then tap Order Materials.');
@@ -1436,141 +1713,181 @@ function orderMaterials() {
 /* ══════════════════════════════════════════
    SHARE
 ══════════════════════════════════════════ */
+let shareKind = 'client', shareNotes = false;
 function showShare() {
-  const e = getEst(db.cur); if (!e) return;
-  const iS=arr=>(arr||[]).reduce((s,it)=>s+(parseFloat(it.qty)||0)*(parseFloat(it.unitPrice)||0),0);
-  const p=e.pr||{},l=e.lb||{};
-  const vS=p.auto!==false?iS(e.lumber)+iS(e.hardware):(p.orv||0);
-  const uc=p.ucMode==='%'?vS*((p.ucVal||0)/100):(p.ucVal||0);
-  const tax=p.taxInc?0:(p.tax||0), del=p.delInc?0:(p.del||0), buf=p.buf||0;
-  const clientMat=vS+uc+tax+buf+del;
-  const cliLab=(l.cliLab||0)+(l.cliDemo||0), gt=clientMat+cliLab;
-  const subExp=(l.subCost||0), expenses=vS+subExp+(e.mgmtLabor||0);
-  const profit=gt-expenses, margin=gt>0?profit/gt*100:0;
-  const pmLabel=e.pmOther||e.pm||'';
-
-  const lines=[];
-  lines.push(e.client||'Estimate');
-  if(e.company) lines.push(`Company: ${e.company}`);
-  if(pmLabel) lines.push(`PM: ${pmLabel}`);
-  if(e.address) lines.push(`Address: ${e.address}`);
-  if(e.notes) lines.push(`\nNotes:\n${e.notes}`);
-  if((e.lumber||[]).length){
-    lines.push('\nLumber');
-    e.lumber.forEach(it=>{
-      const q=parseFloat(it.qty)||0,u=parseFloat(it.unitPrice)||0;
-      lines.push(`\t(${q}) ${it.desc||''}${q&&u?'  — '+fmt(q*u):''}`);
-    });
-  }
-  if((e.hardware||[]).length){
-    lines.push('\nHardware');
-    e.hardware.forEach(it=>{
-      const q=parseFloat(it.qty)||0,u=parseFloat(it.unitPrice)||0;
-      lines.push(`\t(${q}) ${it.desc||''}${q&&u?'  — '+fmt(q*u):''}`);
-    });
-  }
-  lines.push('\nMaterials');
-  lines.push(`\tVendor subtotal: ${fmt(vS)}`);
-  if(p.taxInc) lines.push('\tTaxes: included');
-  else lines.push(`\tTaxes: ${fmt(tax)} (Utah 7.25%)`);
-  if(uc) lines.push(`\tUpcharge: ${fmt(uc)}${p.ucMode==='%'?` (${p.ucVal}%)`:''}` );
-  if(buf) lines.push(`\tBuffer: ${fmt(buf)}`);
-  if(p.delInc) lines.push('\tDelivery: included');
-  else lines.push(`\tDelivery: ${fmt(del)}`);
-  lines.push(`\tTotal: ${fmt(clientMat)}`);
-  lines.push('\nLabor');
-  if(l.name||l.days) lines.push(`\t${l.name||'Sub'}${l.days?', '+l.days+' days':''}, ${fmt(subExp)}`);
-  lines.push(`\tWe charge: ${fmt(cliLab)}${l.cliDemo?` ($${(l.cliDemo).toLocaleString()} for demo)`:''}`);
-  lines.push(`\nGrand total: ${fmt(gt)}`);
-  lines.push('\nExpenses');
-  lines.push(`\tLabor: ${fmt(subExp)}`);
-  if(e.mgmtLabor) lines.push(`\tManaging labor & expenses: ${fmt(e.mgmtLabor)}`);
-  lines.push(`\tMaterials: ${fmt(vS)}`);
-  lines.push(`\tTotal: ${fmt(expenses)}`);
-  lines.push(`\tWe stand to make: ${fmt(profit)} (profit margin: ~${margin.toFixed(0)}%)`);
-
-  document.getElementById('share-txt').value=lines.join('\n');
-  document.getElementById('share-preview').innerHTML=buildDocHTML();
+  if (!getEst(db.cur)) return;
+  shareKind = 'client';
+  renderShare();
   document.getElementById('share-modal').classList.add('on');
 }
+function setShareKind(k) { shareKind = k; renderShare(); }
+function setShareNotes(on) { shareNotes = on; renderShare(); }
+function renderShare() {
+  const e = getEst(db.cur); if (!e) return;
+  document.getElementById('sk-client').classList.toggle('on', shareKind === 'client');
+  document.getElementById('sk-internal').classList.toggle('on', shareKind === 'internal');
+  document.getElementById('share-opts').style.display = shareKind === 'client' && e.notes ? 'flex' : 'none';
+  document.getElementById('share-notes').checked = shareNotes;
+  document.getElementById('share-txt').value = shareText(e, shareKind);
+  const html = buildDocHTML(shareKind);
+  document.getElementById('share-preview').innerHTML = html;
+  document.getElementById('doc').innerHTML = html; // so Safari's own Share → Print isn't blank
+}
 
-/* ── Formatted estimate document (for PDF / print) ── */
-function buildDocHTML(){
-  const e=getEst(db.cur); if(!e) return '';
-  const iS=arr=>(arr||[]).reduce((s,it)=>s+(parseFloat(it.qty)||0)*(parseFloat(it.unitPrice)||0),0);
-  const p=e.pr||{},l=e.lb||{};
-  const vS=p.auto!==false?iS(e.lumber)+iS(e.hardware):(p.orv||0);
-  const uc=p.ucMode==='%'?vS*((p.ucVal||0)/100):(p.ucVal||0);
-  const tax=p.taxInc?0:(p.tax||0), del=p.delInc?0:(p.del||0), buf=p.buf||0;
-  const clientMat=vS+uc+tax+buf+del;
-  const cliLab=(l.cliLab||0)+(l.cliDemo||0), gt=clientMat+cliLab;
-  const subExp=(l.subCost||0), expenses=vS+subExp+(e.mgmtLabor||0);
-  const profit=gt-expenses, margin=gt>0?profit/gt*100:0;
-  const pm=e.pmOther||e.pm||'';
-  const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+const estDate = e => new Date(e.createdAt || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+// Line items worth listing: anything with a quantity and either a name or a price.
+const docItems = arr => (arr || []).filter(it => num(it.qty) > 0 && ((it.desc || '').trim() || num(it.unitPrice)));
+const itemName = it => (it.desc || '').trim() || '(no description)';
 
-  const rows=arr=>(arr||[]).filter(it=>(it.desc||'').trim()).map(it=>{
-    const q=parseFloat(it.qty)||0,u=parseFloat(it.unitPrice)||0;
-    return `<tr><td>${q||''}</td><td>${esc(it.desc)}</td><td class="r">${u?fmt(u):''}</td><td class="r">${q&&u?fmt(q*u):''}</td></tr>`;
-  }).join('');
-  const tbl=(title,arr)=>{ const r=rows(arr); if(!r) return '';
-    return `<div class="doc-sec">${title}</div><table class="doc-tbl"><thead><tr><th style="width:40px">Qty</th><th>Description</th><th class="r" style="width:64px">Unit</th><th class="r" style="width:78px">Total</th></tr></thead><tbody>${r}</tbody></table>`; };
+/* Plain-text version. 'client' never includes costs, markup, profit or margin. */
+function shareText(e, kind) {
+  const c = calc(e), l = e.lb || {}, p = e.pr || {};
+  const pm = e.pmOther || e.pm || '';
+  const lines = [];
+  lines.push(e.client || 'Estimate');
+  if (kind === 'client') lines.push(estDate(e));
+  if (e.company) lines.push(`Company: ${e.company}`);
+  if (pm) lines.push(`PM: ${pm}`);
+  if (e.address) lines.push(`Address: ${e.address}`);
+  if (e.notes && (kind === 'internal' || shareNotes)) lines.push(`\nNotes:\n${e.notes}`);
+  const list = (title, arr) => {
+    const items = kind === 'client' ? docItems(arr) : (arr || []);
+    if (!items.length) return;
+    lines.push('\n' + title);
+    items.forEach(it => {
+      const q = num(it.qty), u = num(it.unitPrice);
+      lines.push(kind === 'client' ? `\t(${q}) ${itemName(it)}` : `\t(${q}) ${it.desc || ''}${q && u ? '  — ' + fmt2(q * u) : ''}`);
+    });
+  };
+  list('Lumber', e.lumber);
+  list('Hardware', e.hardware);
 
-  const meta=[];
-  if(e.company) meta.push(`<div><div class="lbl">Company</div>${esc(e.company)}</div>`);
-  if(pm) meta.push(`<div><div class="lbl">Project Manager</div>${esc(pm)}</div>`);
-  if(e.address) meta.push(`<div><div class="lbl">Address</div>${esc(e.address)}</div>`);
-  meta.push(`<div><div class="lbl">Status</div>${esc(e.status||'draft')}</div>`);
+  if (kind === 'client') {
+    lines.push('');
+    lines.push(`Materials (tax & delivery included): ${fmt(c.clientMat)}`);
+    lines.push(`Labor: ${fmt(c.cliLab)}`);
+    if (c.cliDemo) lines.push(`Demo: ${fmt(c.cliDemo)}`);
+    lines.push(`\nTotal: ${fmt(c.grand)}`);
+    return lines.join('\n');
+  }
 
-  const matRows=[
-    `<div class="doc-row"><span>Vendor subtotal</span><span>${fmt(vS)}</span></div>`,
-    `<div class="doc-row"><span>Taxes${p.taxInc?' (included)':''}</span><span>${fmt(tax)}</span></div>`,
-    uc?`<div class="doc-row"><span>Upcharge${p.ucMode==='%'?' ('+(p.ucVal||0)+'%)':''}</span><span>${fmt(uc)}</span></div>`:'',
-    buf?`<div class="doc-row"><span>Buffer</span><span>${fmt(buf)}</span></div>`:'',
-    `<div class="doc-row"><span>Delivery${p.delInc?' (included)':''}</span><span>${fmt(del)}</span></div>`,
-    `<div class="doc-row b"><span>Client Materials Total</span><span>${fmt(clientMat)}</span></div>`
-  ].join('');
+  lines.push('\nMaterials');
+  lines.push(`\tVendor subtotal: ${fmt(c.vendSub)}`);
+  if (p.taxInc !== false) lines.push('\tTaxes: included');
+  else lines.push(`\tTaxes: ${fmt(c.tax)}${p.taxAuto !== false ? ' (Utah 7.25%)' : ''}`);
+  if (c.uc) lines.push(`\tUpcharge: ${fmt(c.uc)}${c.ucMode === '%' ? ` (${c.ucVal}%)` : ''}`);
+  if (c.buf) lines.push(`\tBuffer: ${fmt(c.buf)}`);
+  if (p.delInc !== false) lines.push('\tDelivery: included');
+  else lines.push(`\tDelivery: ${fmt(c.del)}`);
+  lines.push(`\tTotal: ${fmt(c.clientMat)}`);
+  lines.push('\nLabor');
+  if (l.name || l.days) lines.push(`\t${l.name || 'Sub'}${l.days ? ', ' + plural(num(l.days), 'day') : ''}, ${fmt(c.subCost)}`);
+  lines.push(`\tWe charge: ${fmt(c.cliLabTotal)}${c.cliDemo ? ` (${fmt(c.cliDemo)} for demo)` : ''}`);
+  lines.push(`\nGrand total: ${fmt(c.grand)}`);
+  lines.push('\nExpenses');
+  lines.push(`\tLabor: ${fmt(c.subCost)}`);
+  if (c.mgmt) lines.push(`\tManaging labor & expenses: ${fmt(c.mgmt)}`);
+  lines.push(`\tMaterials: ${fmt(c.vendSub)}`);
+  if (c.tax || c.del) lines.push(`\tTax & delivery paid: ${fmt(c.tax + c.del)}`);
+  lines.push(`\tTotal: ${fmt(c.expenses)}`);
+  lines.push(`\tWe stand to make: ${fmt(c.profit)} (profit margin: ~${c.margin.toFixed(0)}%)`);
+  return lines.join('\n');
+}
 
-  const laborRows=[
-    (l.name||l.days)?`<div class="doc-row"><span>${esc(l.name||'Sub')}${l.days?' — '+esc(l.days)+' days':''}</span><span class="doc-muted">our cost ${fmt(subExp)}</span></div>`:'',
-    `<div class="doc-row"><span>Labor charge</span><span>${fmt(l.cliLab||0)}</span></div>`,
-    l.cliDemo?`<div class="doc-row"><span>Demo charge</span><span>${fmt(l.cliDemo)}</span></div>`:'',
-    `<div class="doc-row b"><span>Client Labor Total</span><span>${fmt(cliLab)}</span></div>`
-  ].join('');
+/* ── Formatted estimate document (for PDF / print) ──
+   'client' is what the customer sees: items, materials total, labor, total.
+   'internal' adds unit prices, markup, our costs, profit and margin. */
+function buildDocHTML(kind) {
+  const e = getEst(db.cur); if (!e) return '';
+  const internal = kind === 'internal';
+  const c = calc(e), p = e.pr || {}, l = e.lb || {};
+  const pm = e.pmOther || e.pm || '';
 
-  const expRows=[
-    `<div class="doc-row"><span>Vendor materials</span><span>${fmt(vS)}</span></div>`,
-    `<div class="doc-row"><span>Sub labor</span><span>${fmt(subExp)}</span></div>`,
-    e.mgmtLabor?`<div class="doc-row"><span>Managing labor &amp; expenses</span><span>${fmt(e.mgmtLabor)}</span></div>`:'',
-    `<div class="doc-row b"><span>Total Expenses</span><span>${fmt(expenses)}</span></div>`,
-    `<div class="doc-row b"><span>Profit</span><span style="color:var(--green)">${fmt(profit)} (${margin.toFixed(1)}%)</span></div>`
-  ].join('');
+  const tbl = (title, arr) => {
+    const items = docItems(arr);
+    if (!items.length) return '';
+    const head = internal
+      ? '<th style="width:40px">Qty</th><th>Description</th><th class="r" style="width:72px">Unit</th><th class="r" style="width:86px">Total</th>'
+      : '<th style="width:48px">Qty</th><th>Description</th>';
+    const body = items.map(it => {
+      const q = num(it.qty), u = num(it.unitPrice);
+      return `<tr><td>${q}</td><td>${esc(itemName(it))}</td>` +
+        (internal ? `<td class="r">${u ? fmt2(u) : ''}</td><td class="r">${q && u ? fmt2(q * u) : ''}</td>` : '') + '</tr>';
+    }).join('');
+    return `<div class="doc-sec">${title}</div><table class="doc-tbl"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+  };
+  const row = (label, val, cls) => `<div class="doc-row${cls ? ' ' + cls : ''}"><span>${label}</span><span>${val}</span></div>`;
+
+  const meta = [];
+  if (e.company) meta.push(`<div><div class="lbl">Company</div>${esc(e.company)}</div>`);
+  if (pm) meta.push(`<div><div class="lbl">Project Manager</div>${esc(pm)}</div>`);
+  if (e.address) meta.push(`<div class="addr"><div class="lbl">Address</div>${esc(e.address)}</div>`);
+  if (internal) meta.push(`<div><div class="lbl">Status</div>${esc(e.status || 'draft')}</div>`);
+
+  const notes = e.notes && (internal || shareNotes)
+    ? `<div class="doc-sec">${internal ? 'Notes' : 'Scope &amp; Notes'}</div><div style="font-size:13px;white-space:pre-wrap;">${esc(e.notes)}</div>` : '';
+
+  let money;
+  if (internal) {
+    money = `<div class="doc-sec">Materials Pricing</div>` + [
+      row('Vendor subtotal', fmt(c.vendSub)),
+      row(`Taxes${p.taxInc !== false ? ' (included)' : ''}`, fmt(c.tax)),
+      c.uc ? row(`Upcharge${c.ucMode === '%' ? ' (' + c.ucVal + '%)' : ''}`, fmt(c.uc)) : '',
+      c.buf ? row('Buffer', fmt(c.buf)) : '',
+      row(`Delivery${p.delInc !== false ? ' (included)' : ''}`, fmt(c.del)),
+      row('Client Materials Total', fmt(c.clientMat), 'b')
+    ].join('') + `<div class="doc-sec">Labor</div>` + [
+      (l.name || l.days) ? row(`${esc(l.name || 'Sub')}${l.days ? ' — ' + esc(plural(num(l.days), 'day')) : ''}`, `<span class="doc-muted">our cost ${fmt(c.subCost)}</span>`) : '',
+      row('Labor charge', fmt(c.cliLab)),
+      c.cliDemo ? row('Demo charge', fmt(c.cliDemo)) : '',
+      row('Client Labor Total', fmt(c.cliLabTotal), 'b')
+    ].join('');
+  } else {
+    money = `<div class="doc-sec">Summary</div>` + [
+      row('Materials (tax &amp; delivery included)', fmt(c.clientMat)),
+      row('Labor', fmt(c.cliLab)),
+      c.cliDemo ? row('Demo', fmt(c.cliDemo)) : ''
+    ].join('');
+  }
+
+  const expRows = internal ? `<div class="doc-sec">Internal — Expenses &amp; Profit</div>` + [
+    row('Vendor materials', fmt(c.vendSub)),
+    (c.tax || c.del) ? row('Tax &amp; delivery paid', fmt(c.tax + c.del)) : '',
+    row('Sub labor', fmt(c.subCost)),
+    c.mgmt ? row('Managing labor &amp; expenses', fmt(c.mgmt)) : '',
+    row('Total Expenses', fmt(c.expenses), 'b'),
+    row('Profit', `<span style="color:var(--green)">${fmt(c.profit)} (${c.margin.toFixed(1)}%)</span>`, 'b')
+  ].join('') : '';
 
   return `<div class="doc-wrap">
     <div class="doc-head">
       <div class="doc-brand"><img src="icon-192.png" alt=""/><div class="nm">QuickQuote</div></div>
-      <div class="doc-title"><div class="t">ESTIMATE</div><div class="d">${date}</div></div>
+      <div class="doc-title"><div class="t">${internal ? 'INTERNAL' : 'ESTIMATE'}</div><div class="d">${estDate(e)}</div></div>
     </div>
-    <div class="doc-job">${esc(e.client||'Untitled Estimate')}</div>
+    <div class="doc-job">${esc(e.client || 'Untitled Estimate')}</div>
     <div class="doc-meta">${meta.join('')}</div>
-    ${e.notes?`<div class="doc-sec">Notes</div><div style="font-size:13px;white-space:pre-wrap;">${esc(e.notes)}</div>`:''}
-    ${tbl('Lumber',e.lumber)}
-    ${tbl('Hardware',e.hardware)}
-    <div class="doc-sec">Materials Pricing</div>${matRows}
-    <div class="doc-sec">Labor</div>${laborRows}
+    ${notes}
+    ${tbl('Lumber', e.lumber)}
+    ${tbl('Hardware', e.hardware)}
+    ${money}
     <div class="doc-total">
-      <div><div class="cap">GRAND TOTAL (CLIENT)</div><div class="amt">${fmt(gt)}</div></div>
-      <div style="text-align:right"><div class="cap">MARGIN</div><div class="amt">${gt>0?margin.toFixed(1)+'%':'—'}</div></div>
+      <div><div class="cap">${internal ? 'GRAND TOTAL (CLIENT)' : 'TOTAL'}</div><div class="amt">${fmt(c.grand)}</div></div>
+      ${internal ? `<div style="text-align:right"><div class="cap">MARGIN</div><div class="amt">${c.grand > 0 ? c.margin.toFixed(1) + '%' : '—'}</div></div>` : ''}
     </div>
-    <div class="doc-sec">Internal — Expenses &amp; Profit</div>${expRows}
+    ${expRows}
   </div>`;
 }
-function printDoc(){
-  document.getElementById('doc').innerHTML=buildDocHTML();
+function printDoc() {
+  const e = getEst(db.cur); if (!e) return;
+  document.getElementById('doc').innerHTML = buildDocHTML(shareKind);
+  // The PDF's file name comes from the page title.
+  const title = document.title;
+  document.title = (shareKind === 'internal' ? 'Internal - ' : 'Estimate - ') + (e.client || 'Untitled');
+  window.addEventListener('afterprint', () => { document.title = title; }, { once: true });
   window.print();
 }
 
-function closeShare(){ document.getElementById('share-modal').classList.remove('on'); }
+function closeShare() { document.getElementById('share-modal').classList.remove('on'); }
 
 function copyShare(){
   const txt=document.getElementById('share-txt');
@@ -1589,6 +1906,28 @@ document.getElementById('manage-modal').addEventListener('click',function(e){ if
 ══════════════════════════════════════════ */
 dbLoad();
 goList();
+// Ask the browser not to evict our data under storage pressure.
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+
+/* ══════════════════════════════════════════
+   OFFLINE (service worker)
+══════════════════════════════════════════ */
+let swWaiting = null, swReload = false;
+function showUpdate(w){ swWaiting=w; document.getElementById('upd').classList.add('on'); }
+function applyUpdate(){ swReload=true; if(swWaiting) swWaiting.postMessage('skipWaiting'); else location.reload(); }
+if('serviceWorker' in navigator){
+  // Only reload when the user asked for the update (not on the very first install).
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(swReload){ swReload=false; location.reload(); } });
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    if(reg.waiting && navigator.serviceWorker.controller) showUpdate(reg.waiting);
+    reg.addEventListener('updatefound',()=>{
+      const w=reg.installing;
+      w.addEventListener('statechange',()=>{ if(w.state==='installed' && navigator.serviceWorker.controller) showUpdate(w); });
+    });
+    // Home-screen apps can stay open for days; check for a new version when brought back.
+    document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') reg.update().catch(()=>{}); });
+  }).catch(()=>{});
+}
 </script>
 </body>
 </html>

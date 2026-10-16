@@ -1,0 +1,54 @@
+name: Deploy to GitHub Pages
+
+# Publishes the app on every push to master, but only after the tests pass.
+# One-time setup: repo Settings → Pages → Source: "GitHub Actions".
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Collect site files
+        run: |
+          mkdir _site
+          cp index.html sw.js manifest.json icon-192.png icon-512.png apple-touch-icon.png _site/
+          # A new service-worker version on every deploy, so phones get the
+          # "Update available" prompt without anyone remembering to bump it.
+          sed -i "s/const VERSION = '[^']*'/const VERSION = 'qq-${GITHUB_SHA::8}'/" _site/sw.js
+          grep -q "qq-${GITHUB_SHA::8}" _site/sw.js
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
