@@ -21,12 +21,29 @@ Useful variants:
 npx playwright test tests/e2e.spec.js     # one file
 npx playwright test -g "upcharge"         # by test name
 npx playwright test --headed              # watch it run
-RUN_FIXME=1 npx playwright test -g BUG    # run the known-bug tests (they should fail)
 ```
 
 What the tests cover, and how each calculation is meant to work, is written up in
-[`tests/CALCULATIONS.md`](tests/CALCULATIONS.md). Tests named `BUG: …` document
-suspected bugs; they're marked `test.fixme` so CI stays green. When you fix one,
-change its `bug(` to `test(` so it guards against regressions.
+[`tests/CALCULATIONS.md`](tests/CALCULATIONS.md). To document a suspected bug
+without breaking CI, write the test with `bug(` instead of `test(` (it's skipped
+unless `RUN_FIXME=1`), and switch it to `test(` once fixed.
 
 CI (`.github/workflows/tests.yml`) runs the suite on every push and pull request.
+
+## Deploying
+
+`.github/workflows/deploy.yml` publishes the app to GitHub Pages on every push to
+`master`, after the tests pass. It stamps `sw.js` with the commit so installed
+phones show "Update available — tap to reload".
+
+One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+The app is then at `https://ethanperrine111-gif.github.io/estimates/`. Open it in
+Safari, then **Share → Add to Home Screen**. Data saved in Safari and in the
+Home Screen app are separate, so always use the Home Screen icon.
+
+## Your data
+
+Estimates, companies, subs and prices live only on the phone (`localStorage`).
+Use **☰ → Export backup** regularly (the list screen reminds you after 7 days) and
+keep the file in iCloud Drive/Files. **☰ → Import backup** restores it on any
+phone. Deleting the Home Screen icon deletes its data.

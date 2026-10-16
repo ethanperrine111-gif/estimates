@@ -1,5 +1,5 @@
 const {
-  test, expect, bug, openApp, newEstimate, currentEst, stored, answerNextPrompt,
+  test, expect, openApp, newEstimate, currentEst, stored, answerNextPrompt,
   openManage, closeManage, setMenuRate, addSubViaMenu,
 } = require('./helpers');
 
@@ -28,9 +28,7 @@ test.describe('labor from days', () => {
     await expect(page.locator('#s-e-lab')).toHaveText('$1,063'); // 1062.50 rounds up
   });
 
-  bug('BUG: computed sub cost can show floating-point noise in the field', async ({ page }) => {
-    // recalcLabor() writes days × rate straight into the input without
-    // rounding: 2.5 × 333.33 shows as "833.3249999999999".
+  test('computed sub cost is rounded to cents', async ({ page }) => {
     await page.locator('#sub-days').fill('2.5');
     await page.locator('#sub-daily').fill('333.33');
     await expect(page.locator('#sub-cost')).toHaveValue(/^833\.3\d{0,2}$/); // 833.32/833.33/833.325 — any sane rounding
@@ -99,11 +97,7 @@ test.describe('subs', () => {
     expect((await stored(page)).subs).toEqual([{ name: 'Carl Concrete', daily: 425 }]);
   });
 
-  bug('BUG: a sub rate edited in the menu is reverted by the open estimate', async ({ page }) => {
-    // sv() copies the estimate's #sub-daily back onto the saved sub on every
-    // keystroke. If the rate is changed in the menu while an estimate using
-    // that sub is open, the next edit anywhere on the estimate silently puts
-    // the old rate back.
+  test('a sub rate edited in the menu is not reverted by the open estimate', async ({ page }) => {
     await openManage(page);
     await addSubViaMenu(page, 'Bob Framing', 400);
     await closeManage(page);
@@ -187,10 +181,7 @@ test.describe('rates in the menu', () => {
     await expect(page.locator('#mgmt-labor')).toHaveValue('100');
   });
 
-  bug('BUG: changing a menu rate wipes hand-entered labor numbers', async ({ page }) => {
-    // updRate() always calls recalcLabor(), which overwrites #sub-cost and
-    // #cli-labor from days × rate — and blanks them when Days is empty. A
-    // labor charge typed by hand is lost just by adjusting the $/hr rate.
+  test('changing a menu rate keeps hand-entered labor numbers', async ({ page }) => {
     await page.locator('#cli-labor').fill('4500');
     await page.locator('#sub-cost').fill('1200');
     await openManage(page);
@@ -200,12 +191,54 @@ test.describe('rates in the menu', () => {
     await expect(page.locator('#sub-cost')).toHaveValue('1200');
   });
 
-  bug('BUG: picking a sub wipes hand-entered labor numbers when Days is blank', async ({ page }) => {
+  test('picking a sub keeps hand-entered labor numbers when Days is blank', async ({ page }) => {
     await openManage(page);
     await addSubViaMenu(page, 'Bob Framing', 400);
     await closeManage(page);
     await page.locator('#cli-labor').fill('4500');
     await page.locator('#sub-sel').selectOption('Bob Framing');
     await expect(page.locator('#cli-labor')).toHaveValue('4500');
+  });
+});
+
+test.describe('hand-typed amounts', () => {
+  test('typing the sub\'s daily rate keeps hand-typed amounts', async ({ page }) => {
+    await page.locator('#sub-cost').fill('2400');
+    await page.locator('#cli-labor').fill('5000');
+    await page.locator('#sub-daily').fill('400');
+    await expect(page.locator('#sub-cost')).toHaveValue('2400');
+    await expect(page.locator('#cli-labor')).toHaveValue('5000');
+    await expect(page.locator('#gt-amount')).toHaveText('$5,300');
+  });
+
+  test('changing days keeps a typed labor charge, and the badge says it was typed', async ({ page }) => {
+    await page.locator('#sub-days').fill('2');
+    await page.locator('#cli-labor').fill('4500');
+    await expect(page.locator('#cli-rate-badge')).toHaveText('typed');
+    await page.locator('#sub-days').fill('3');
+    await expect(page.locator('#cli-labor')).toHaveValue('4500');
+    // clearing the field hands it back to auto-calc
+    await page.locator('#cli-labor').fill('');
+    await page.locator('#sub-days').fill('2');
+    await expect(page.locator('#cli-labor')).toHaveValue('6000');
+    await expect(page.locator('#cli-rate-badge')).toHaveText('$3,000/day');
+  });
+
+  test('typed amounts stay typed after a reload', async ({ page }) => {
+    await page.locator('#sub-days').fill('2');
+    await page.locator('#cli-labor').fill('4500');
+    await page.reload();
+    await page.locator('.est-card').click();
+    await page.locator('#sub-days').fill('4');
+    await expect(page.locator('#cli-labor')).toHaveValue('4500');
+  });
+
+  test('a changed menu rate leaves estimates with no days alone', async ({ page }) => {
+    await page.locator('#mgmt-labor').fill('250');
+    await openManage(page);
+    await setMenuRate(page, 'mgmtHr', 50);
+    await setMenuRate(page, 'clientDay', 3500);
+    await closeManage(page);
+    await expect(page.locator('#mgmt-labor')).toHaveValue('250');
   });
 });

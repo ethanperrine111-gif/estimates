@@ -1,6 +1,7 @@
 /* QuickQuote service worker — offline cache.
-   Bump VERSION on every deploy: the browser sees sw.js changed, installs the
-   new worker, and the app shows "Update available — tap to reload". */
+   The deploy workflow stamps VERSION with the commit on every deploy: the browser
+   sees sw.js changed, installs the new worker, and the app shows
+   "Update available — tap to reload". */
 'use strict';
 
 const VERSION = 'qq-v1';

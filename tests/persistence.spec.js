@@ -1,5 +1,5 @@
 const {
-  test, expect, openApp, newEstimate, addLine, rows, stored, answerNextPrompt,
+  test, expect, openApp, newEstimate, addLine, rows, stored, currentEst, seed, answerNextPrompt,
   openManage, closeManage, setMenuRate, addSubViaMenu, addCompanyViaMenu,
 } = require('./helpers');
 
@@ -131,4 +131,64 @@ test('"+ Add new company" in the dropdown prompts, saves and selects it', async 
   const db = await stored(page);
   expect(db.companies).toEqual(['Beta Remodel']);
   expect(db.ests[0].company).toBe('Beta Remodel');
+});
+
+test('removing a company or sub from the list keeps it on estimates that use it', async ({ page }) => {
+  await openApp(page);
+  await openManage(page);
+  await addCompanyViaMenu(page, 'Acme Builders');
+  await addSubViaMenu(page, 'Bob Framing', 400);
+  await closeManage(page);
+  await newEstimate(page);
+  await page.locator('#f-companysel').selectOption('Acme Builders');
+  await page.locator('#sub-sel').selectOption('Bob Framing');
+  await openManage(page);
+  page.on('dialog', d => d.accept());
+  await page.locator('#company-list .mg-x').click();
+  await page.locator('#sub-list .mg-x').click();
+  await closeManage(page);
+  await page.locator('#f-notes').fill('touch the estimate');
+  const e = await currentEst(page);
+  expect(e.company).toBe('Acme Builders');
+  expect(e.lb.name).toBe('Bob Framing');
+  await expect(page.locator('#f-companysel option:checked')).toHaveText('Acme Builders (removed)');
+  expect((await stored(page)).companies).toEqual([]);
+});
+
+test('estimates saved by the old version keep their numbers', async ({ page }) => {
+  // Old tax was a one-time snapshot and labor had no "typed" flag.
+  await seed(page, { ests: [{
+    id: 'old1', client: 'Old Job', status: 'sent', lumber: [{ qty: 2, desc: 'a', unitPrice: 1000 }], hardware: [],
+    pr: { auto: true, orv: 0, taxInc: false, tax: 73, ucMode: '%', ucVal: 20, buf: 300, delInc: true, del: 0 },
+    lb: { name: '', days: '', daily: 0, subCost: 2400, cliLab: 5000, cliDemo: 0 }, mgmtLabor: 0, mgmtHours: 0,
+  }], cur: null });
+  // 2000 + 400 + 73 + 300 + 5000
+  await expect(page.locator('.est-card .ec-total')).toHaveText('$7,773');
+  await page.locator('.est-card').click();
+  await expect(page.locator('#tax-amt')).toHaveValue('73');
+  await page.locator('#sub-daily').fill('400');
+  await expect(page.locator('#sub-cost')).toHaveValue('2400');
+  await expect(page.locator('#cli-labor')).toHaveValue('5000');
+  await expect(page.locator('#gt-amount')).toHaveText('$7,773');
+});
+
+test('the list nags for a backup until one is made', async ({ page }) => {
+  await openApp(page);
+  await expect(page.locator('#backup-nag')).toBeHidden();
+  await newEstimate(page);
+  await page.getByRole('button', { name: 'Save & Back' }).click();
+  await expect(page.locator('#backup-nag')).toBeVisible();
+  await expect(page.locator('#backup-nag')).toContainText('never been backed up');
+  const download = page.waitForEvent('download');
+  await page.locator('#backup-nag button').click();
+  await download;
+  await expect(page.locator('#backup-nag')).toBeHidden();
+});
+
+test('a failed save shows a warning instead of failing silently', async ({ page }) => {
+  await openApp(page);
+  await newEstimate(page);
+  await page.evaluate(() => { Storage.prototype.setItem = () => { throw new Error('QuotaExceededError'); }; });
+  await page.locator('#f-client').fill('x');
+  await expect(page.locator('#save-warn')).toBeVisible();
 });

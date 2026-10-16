@@ -54,7 +54,7 @@ async function addLine(page, type, { qty, desc, price } = {}) {
     .getByRole('button', { name: '＋ Add item' }).click();
   await expect(rows(page, type)).toHaveCount(before + 1);
   const row = rows(page, type).nth(before);
-  if (desc !== undefined) await row.locator('input[type=text]').fill(desc);
+  if (desc !== undefined) await row.locator('.iinp.desc').fill(desc);
   if (qty !== undefined) await row.locator('.iinp.qty').fill(String(qty));
   if (price !== undefined) await row.locator('.iinp.price').fill(String(price));
   return row;

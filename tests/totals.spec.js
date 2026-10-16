@@ -1,4 +1,4 @@
-const { test, expect, bug, openApp, newEstimate, addLine, seed } = require('./helpers');
+const { test, expect, openApp, newEstimate, addLine, seed } = require('./helpers');
 
 test.describe('grand total, expenses, profit', () => {
   test.beforeEach(async ({ page }) => {
@@ -28,14 +28,16 @@ test.describe('grand total, expenses, profit', () => {
     await expect(page.locator('#pbar-lbl')).toHaveText('75.8% profit margin');
   });
 
-  test('upcharge, buffer, tax and delivery are client-side only; demo has no cost', async ({ page }) => {
+  test('upcharge and buffer are client-side only; tax and delivery we pay are costs; demo has no cost', async ({ page }) => {
     await addLine(page, 'lumber', { desc: 'a', qty: 1, price: 1000 });
     await page.locator('#tax-inc').uncheck();
     await page.locator('#del-inc').uncheck();
     await page.locator('#cli-demo').fill('250');
     // 1000 + 200 + 73 + 300 + 100 + 250
     await expect(page.locator('#gt-amount')).toHaveText('$1,923');
-    await expect(page.locator('#s-exp')).toHaveText('$1,000');
+    // 1000 vendor + 73 tax + 100 delivery
+    await expect(page.locator('#s-exp')).toHaveText('$1,173');
+    await expect(page.locator('#s-e-taxdel')).toHaveText('$173');
   });
 
   test('margin shows a dash and empty bar label when grand total is 0', async ({ page }) => {
@@ -68,24 +70,11 @@ test.describe('grand total, expenses, profit', () => {
     await expect(page.locator('#pbar-fill')).toHaveAttribute('style', /width: 0%/);
   });
 
-  bug('BUG: negative profit is formatted as "$-500" instead of "-$500"', async ({ page }) => {
-    // fmt() is '$' + n.toLocaleString(), so the minus sign lands after the $.
+  test('negative profit is formatted as "-$500"', async ({ page }) => {
     await page.locator('#buf-val').fill('0');
     await page.locator('#cli-labor').fill('1000');
     await page.locator('#sub-cost').fill('1500');
     await expect(page.locator('#s-profit')).toHaveText('-$500');
-  });
-
-  bug('BUG: tax and delivery charged to the client are not counted as expenses', async ({ page }) => {
-    // When Taxes / Delivery are NOT "included" in the vendor price, the client
-    // is charged for them (rc() adds them to client materials) — but we also
-    // pay them to the vendor, and rc() leaves them out of expenses. Profit is
-    // overstated by tax + delivery. (Needs owner confirmation: if these are
-    // intended as pure pass-through markup, this test is wrong.)
-    await addLine(page, 'lumber', { desc: 'a', qty: 1, price: 1000 });
-    await page.locator('#tax-inc').uncheck();   // $73
-    await page.locator('#del-inc').uncheck();   // $100
-    await expect(page.locator('#s-exp')).toHaveText('$1,173');
   });
 });
 
@@ -115,7 +104,7 @@ test.describe('currency formatting & rounding', () => {
   test('totals are computed on unrounded line values', async ({ page }) => {
     // three lines of 1 × $0.40 each show $0, but sum to $1.20 → $1
     for (let i = 0; i < 3; i++) await addLine(page, 'hardware', { desc: 'n' + i, qty: 1, price: 0.4 });
-    await expect(page.locator('#hardware-tb .irow-tot').first()).toHaveText('$0');
+    await expect(page.locator('#hardware-tb .irow-tot').first()).toHaveText('$0.40');
     await expect(page.locator('#vendor-disp')).toHaveText('$1');
   });
 

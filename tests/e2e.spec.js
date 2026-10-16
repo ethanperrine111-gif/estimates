@@ -1,7 +1,7 @@
 // End-to-end flows: set up a company, build an estimate, open Share, and check
 // that the preview document and the copyable text agree with the editor.
 const {
-  test, expect, bug, openApp, newEstimate, addLine, openQuickPick, rows,
+  test, expect, openApp, newEstimate, addLine, openQuickPick, rows,
   answerNextPrompt, openManage, closeManage, setMenuRate, addSubViaMenu,
   addCompanyViaMenu, docRow,
 } = require('./helpers');
@@ -28,6 +28,29 @@ async function openShare(page) {
   await expect(page.locator('#share-modal')).toHaveClass(/on/);
 }
 
+async function showInternal(page) {
+  await page.locator('#sk-internal').click();
+  await expect(page.locator('#share-preview .doc-title .t')).toHaveText('INTERNAL');
+}
+
+/** The customer version must never show our costs, markup, profit or margin. */
+async function expectCustomerDocClean(page, n) {
+  const doc = page.locator('#share-preview');
+  await expect(page.locator('#sk-client')).toHaveClass(/on/);
+  await expect(doc.locator('.doc-title .t')).toHaveText('ESTIMATE');
+  for (const word of ['our cost', 'Internal', 'Profit', 'MARGIN', 'Upcharge', 'Buffer', 'Vendor', 'Expenses', 'Status', '%'])
+    await expect(doc).not.toContainText(word);
+  // no unit prices or line totals in the item tables
+  await expect(doc.locator('.doc-tbl thead th', { hasText: /Unit|Total/ })).toHaveCount(0);
+  await expect(docRow(page, 'Materials (tax & delivery included)')).toHaveText(n.clientMat);
+  await expect(page.locator('#share-preview .doc-total .amt')).toHaveText([n.grand]);
+  const txt = await page.locator('#share-txt').inputValue();
+  for (const word of ['stand to make', 'margin', 'Upcharge', 'Buffer', 'Vendor', 'Expenses', 'Managing'])
+    expect(txt).not.toContain(word);
+  expect(txt).toContain(`Materials (tax & delivery included): ${n.clientMat}`);
+  expect(txt).toContain(`Total: ${n.grand}`);
+}
+
 async function expectDocMatchesEditor(page, n) {
   await expect(docRow(page, 'Vendor subtotal')).toHaveText(n.vendor);
   await expect(docRow(page, 'Client Materials Total')).toHaveText(n.clientMat);
@@ -35,6 +58,7 @@ async function expectDocMatchesEditor(page, n) {
   await expect(page.locator('#share-preview .doc-total .amt').first()).toHaveText(n.grand);
   await expect(page.locator('#share-preview .doc-total .amt').last()).toHaveText(n.margin);
   await expect(docRow(page, 'Vendor materials')).toHaveText(n.expVendor);
+  if (n.expTaxDel) await expect(docRow(page, 'Tax & delivery paid')).toHaveText(n.expTaxDel);
   await expect(docRow(page, 'Sub labor')).toHaveText(n.expSub);
   await expect(docRow(page, 'Total Expenses')).toHaveText(n.expenses);
   await expect(docRow(page, 'Profit')).toHaveText(`${n.profit} (${n.margin})`);
@@ -88,16 +112,24 @@ test('flow 1: company from dropdown, quick picks, sub by days, % upcharge → sh
   await expect(doc.locator('.doc-meta')).toContainText('Acme Builders');
   await expect(doc.locator('.doc-meta')).toContainText('Jake');
   await expect(doc.locator('.doc-meta')).toContainText('88 Canyon Rd, Orem, UT');
+
+  // customer version (the default)
+  await expectCustomerDocClean(page, n);
+  await expect(docRow(page, 'Labor')).toHaveText('$7,500');
+  await expect(docRow(page, 'Demo')).toHaveText('$250');
+  await expect(doc.locator('.doc-tbl').nth(0).locator('tbody tr').nth(0).locator('td')).toHaveText(['10', '2x4 8\'']);
+
+  await showInternal(page);
   await expectDocMatchesEditor(page, n);
 
-  // line item tables
+  // line item tables, with cents
   const lumberRows = doc.locator('.doc-tbl').nth(0).locator('tbody tr');
   await expect(lumberRows).toHaveCount(2);
-  await expect(lumberRows.nth(0).locator('td')).toHaveText(['10', '2x4 8\'', '$4', '$43']);
-  await expect(lumberRows.nth(1).locator('td')).toHaveText(['4', '4x4 8\'', '$19', '$75']);
+  await expect(lumberRows.nth(0).locator('td')).toHaveText(['10', '2x4 8\'', '$4.25', '$42.50']);
+  await expect(lumberRows.nth(1).locator('td')).toHaveText(['4', '4x4 8\'', '$18.75', '$75.00']);
   const hwRows = doc.locator('.doc-tbl').nth(1).locator('tbody tr');
-  await expect(hwRows.nth(0).locator('td')).toHaveText(['20', 'H2.5', '$1', '$22']);
-  await expect(hwRows.nth(1).locator('td')).toHaveText(['2', 'LUS28', '$3', '$7']);
+  await expect(hwRows.nth(0).locator('td')).toHaveText(['20', 'H2.5', '$1.10', '$22.00']);
+  await expect(hwRows.nth(1).locator('td')).toHaveText(['2', 'LUS28', '$3.45', '$6.90']);
 
   // materials / labor breakdown rows
   await expect(docRow(page, 'Taxes (included)')).toHaveText('$0');
@@ -112,7 +144,7 @@ test('flow 1: company from dropdown, quick picks, sub by days, % upcharge → sh
   // plain-text share
   const txt = await page.locator('#share-txt').inputValue();
   expect(txt).toContain('Henderson Deck\nCompany: Acme Builders\nPM: Jake\nAddress: 88 Canyon Rd, Orem, UT');
-  expect(txt).toContain('\t(10) 2x4 8\'  — $43');
+  expect(txt).toContain('\t(10) 2x4 8\'  — $42.50');
   expect(txt).toContain('\tVendor subtotal: $146\n\tTaxes: included\n\tUpcharge: $29 (20%)\n\tBuffer: $300\n\tDelivery: included\n\tTotal: $476');
   expect(txt).toContain('\tBob Framing, 2.5 days, $1,000');
   expect(txt).toContain('\tWe charge: $7,750 ($250 for demo)');
@@ -154,52 +186,84 @@ test('flow 2: menu rates + company, $ upcharge, tax & delivery charged → share
   await page.locator('#mgmt-hours').fill('2');                   // 80
 
   // client materials = 624 + 150 + 45 + 300 + 100 = 1219; grand = 4419
-  // expenses = 624 + 350 + 80 = 1054; profit = 3365; margin = 76.15%
+  // expenses = 624 + 45 tax + 100 delivery (we pay them) + 350 + 80 = 1199
+  // profit = 3220; margin = 72.87%
   const n = await editorNumbers(page);
   expect(n).toEqual({
-    vendor: '$624', clientMat: '$1,219', clientLab: '$3,200', grand: '$4,419', margin: '76.1%',
-    expVendor: '$624', expSub: '$350', expMgmt: '$80', expenses: '$1,054', profit: '$3,365',
+    vendor: '$624', clientMat: '$1,219', clientLab: '$3,200', grand: '$4,419', margin: '72.9%',
+    expVendor: '$624', expSub: '$350', expMgmt: '$80', expenses: '$1,199', profit: '$3,220',
   });
+  n.expTaxDel = '$145';
+  await expect(page.locator('#s-e-taxdel')).toHaveText('$145');
 
   await openShare(page);
+  await expectCustomerDocClean(page, n);
+  await showInternal(page);
   await expectDocMatchesEditor(page, n);
   await expect(docRow(page, 'Taxes')).toHaveText('$45');
   await expect(docRow(page, 'Upcharge')).toHaveText('$150');
   await expect(docRow(page, 'Delivery')).toHaveText('$100');
-  await expect(docRow(page, 'Ann Decks — 1 days')).toHaveText('our cost $350');
+  await expect(docRow(page, 'Ann Decks — 1 day')).toHaveText('our cost $350');
   await expect(page.locator('#share-preview .doc-row', { hasText: 'Demo charge' })).toHaveCount(0);
 
   const txt = await page.locator('#share-txt').inputValue();
   expect(txt).toContain('\tTaxes: $45 (Utah 7.25%)\n\tUpcharge: $150\n\tBuffer: $300\n\tDelivery: $100\n\tTotal: $1,219');
   expect(txt).toContain('\tWe charge: $3,200\n');
   expect(txt).toContain('Grand total: $4,419');
-  expect(txt).toContain('We stand to make: $3,365 (profit margin: ~76%)');
+  expect(txt).toContain('\tMaterials: $624\n\tTax & delivery paid: $145\n\tTotal: $1,199');
+  expect(txt).toContain('We stand to make: $3,220 (profit margin: ~73%)');
 
   // editing after closing Share is reflected the next time it opens
   await page.locator('#share-modal .sm-close').click();
   await page.locator('#cli-demo').fill('500');
   await openShare(page);
   await expect(page.locator('#share-preview .doc-total .amt').first()).toHaveText('$4,919');
+  await expect(docRow(page, 'Demo')).toHaveText('$500');
+  await showInternal(page);
   await expect(docRow(page, 'Demo charge')).toHaveText('$500');
 });
 
-test('share document skips line items without a description', async ({ page }) => {
+test('share document lists priced items even without a description, and skips empty rows', async ({ page }) => {
   await openApp(page);
   await newEstimate(page);
   await addLine(page, 'lumber', { desc: 'Real item', qty: 2, price: 10 });
   await addLine(page, 'lumber', { qty: 1, price: 99 }); // no description, still priced
+  await addLine(page, 'lumber');                         // blank row: left out
   await openShare(page);
-  await expect(page.locator('#share-preview .doc-tbl tbody tr')).toHaveCount(1);
-  // ...but its cost still counts in the totals
+  const trs = page.locator('#share-preview .doc-tbl tbody tr');
+  await expect(trs).toHaveCount(2);
+  await expect(trs.nth(1).locator('td')).toHaveText(['1', '(no description)']);
+  await showInternal(page);
   await expect(docRow(page, 'Vendor subtotal')).toHaveText('$119');
 });
 
-bug('BUG: customer document rounds unit prices to whole dollars', async ({ page }) => {
-  // buildDocHTML() formats unit prices with fmt(), which drops cents, so a
-  // $2.49 board reads "3 × $2 = $7" on the document the customer sees.
+test('customer document only includes job notes when asked', async ({ page }) => {
+  await openApp(page);
+  await newEstimate(page);
+  await page.locator('#f-notes').fill('Customer wants it cheap');
+  await openShare(page);
+  await expect(page.locator('#share-preview')).not.toContainText('Customer wants it cheap');
+  expect(await page.locator('#share-txt').inputValue()).not.toContain('Customer wants it cheap');
+  await page.locator('#share-notes').check();
+  await expect(page.locator('#share-preview')).toContainText('Customer wants it cheap');
+  expect(await page.locator('#share-txt').inputValue()).toContain('Customer wants it cheap');
+});
+
+test('qty 0 rows are left off the share document', async ({ page }) => {
+  await openApp(page);
+  await newEstimate(page);
+  await addLine(page, 'lumber', { desc: 'keep', qty: 2, price: 10 });
+  const r = await addLine(page, 'lumber', { desc: 'skip', price: 10 });
+  await r.locator('.iinp.qty').fill('0');
+  await openShare(page);
+  await expect(page.locator('#share-preview .doc-tbl tbody tr')).toHaveCount(1);
+});
+
+test('internal document shows unit prices with cents', async ({ page }) => {
   await openApp(page);
   await newEstimate(page);
   await addLine(page, 'lumber', { desc: '2x4 8\'', qty: 3, price: 2.49 });
   await openShare(page);
+  await showInternal(page);
   await expect(page.locator('#share-preview .doc-tbl tbody tr td').nth(2)).toHaveText('$2.49');
 });

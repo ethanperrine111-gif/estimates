@@ -74,14 +74,36 @@ test('tax amount is editable, and re-checking Included removes it', async ({ pag
   await expect(page.locator('#client-mat-total')).toHaveText('$1,500');
 });
 
-test('auto tax is a snapshot: adding items later does not change it', async ({ page }) => {
+test('auto tax follows the vendor subtotal as items change', async ({ page }) => {
   await addLine(page, 'lumber', { desc: 'x', qty: 1, price: 1000 });
   await page.locator('#tax-inc').uncheck();
   await expect(page.locator('#tax-amt')).toHaveValue('73');
   await addLine(page, 'lumber', { desc: 'y', qty: 1, price: 1000 });
-  await expect(page.locator('#tax-amt')).toHaveValue('73');
-  // 2000 + 400 + 73 + 300
-  await expect(page.locator('#client-mat-total')).toHaveText('$2,773');
+  await expect(page.locator('#tax-amt')).toHaveValue('145'); // 2000 × 7.25%
+  // 2000 + 400 + 145 + 300
+  await expect(page.locator('#client-mat-total')).toHaveText('$2,845');
+});
+
+test('a typed tax amount stays put and drops the Utah badge', async ({ page }) => {
+  await addLine(page, 'lumber', { desc: 'x', qty: 1, price: 1000 });
+  await page.locator('#tax-inc').uncheck();
+  await page.locator('#tax-amt').fill('90');
+  await expect(page.locator('#tax-auto-badge')).toBeHidden();
+  await addLine(page, 'lumber', { desc: 'y', qty: 1, price: 1000 });
+  await expect(page.locator('#tax-amt')).toHaveValue('90');
+  // clearing it goes back to automatic
+  await page.locator('#tax-amt').fill('');
+  await page.locator('#tax-amt').blur();
+  await page.locator('#buf-val').fill('300');
+  await expect(page.locator('#tax-amt')).toHaveValue('145');
+  await expect(page.locator('#tax-auto-badge')).toBeVisible();
+});
+
+test('unticking Auto vendor starts the override at the current subtotal', async ({ page }) => {
+  await addLine(page, 'lumber', { desc: 'x', qty: 2, price: 250 });
+  await page.locator('#auto-vendor').uncheck();
+  await expect(page.locator('#vendor-or')).toHaveValue('500');
+  await expect(page.locator('#vendor-disp')).toHaveText('$500');
 });
 
 test('unchecking Delivery adds the $100 default, which is editable', async ({ page }) => {
